@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="modules">
+        <item>io.trigger.forge.android.modules.inspector</item>
+        <item>io.trigger.forge.android.modules.alert</item>
+        <item>io.trigger.forge.android.modules.contextmenu</item>
+        <item>io.trigger.forge.android.modules.keyboard</item>
+        <item>io.trigger.forge.android.modules.events</item>
+        <item>io.trigger.forge.android.modules.contprov</item>
+    </string-array>
+</resources>

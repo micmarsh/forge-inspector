@@ -1,0 +1,16 @@
+{
+	"config_version": "3",
+	"uuid": "inspector",
+	"name": "ForgeInspector",
+	"author": "Trigger.io",
+	"version": "1.0",
+	"platform_version": "default",
+	"modules": {
+		"inspector": true,
+		"alert": true,
+		"keyboard": true,
+		"contextmenu":true,
+		"events":true,
+		"contprov":true
+	}
+}
