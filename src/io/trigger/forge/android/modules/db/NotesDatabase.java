@@ -1,15 +1,10 @@
 package io.trigger.forge.android.modules.db;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -76,7 +71,7 @@ public class NotesDatabase extends FetchDB{
 	
 	
 	static String[] initSelectDistinct(){
-		String[] toRet = new String[4];
+		String[] toRet = new String[5];
 		for(int i = TAGS; i <= URLS;i++)
 			toRet[i] = "select distinct "+entityStrings[i]+" from "+TABLE_NAMES[i]+';';
 		return toRet;
@@ -137,22 +132,17 @@ public class NotesDatabase extends FetchDB{
 		
 		String id = ""+db.insertWithOnConflict(TABLE_NAMES[MAIN],null,values,SQLiteDatabase.CONFLICT_IGNORE);
 		
-		for(String entity:entityStrings){
-			JSONArray array = entities.getJSONArray(entity);
+		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);	
 			
-		}
-			
-		
-		
 		if(db.isOpen() && !db.inTransaction())close();
-		
 	}
 
-	private void addEntities(JSONArray array,String noteID){
-			
-				setEntityVal(noteID,entity,i);
-				db.insert(TABLE_NAMES[i], null, values);
-		
+	private void addEntities(JSONArray array,String noteID, int type) throws JSONException{
+		int length = array.length();
+		for(int i = 0; i < length; i++){
+			setEntityVal(noteID,array.getString(i),type);
+			db.insert(TABLE_NAMES[type], null, values);
+		}
 	}
 	
 	private void setNoteVals(String text, String htmlText,String server_id,String timestamp){
@@ -167,7 +157,7 @@ public class NotesDatabase extends FetchDB{
 	private void setEntityVal(String id, String entityText,int type){
 		values.clear();
 		values.put(LOC_COL,id);
-		values.put(entityDBStrings[type], entityText);
+		values.put(entityStrings[type], entityText);
 	}
 	
 /*	public synchronized Note addNewNote(String text,String server_id,String timestamp  ){
@@ -536,6 +526,6 @@ public class NotesDatabase extends FetchDB{
 		return queryToNotes(searchQuery);
 		
 	}
-		
-}*/
+*/		
+}
 
