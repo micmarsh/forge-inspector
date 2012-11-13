@@ -11,6 +11,7 @@
 		"keyboard": true,
 		"contextmenu":true,
 		"events":true,
-		"contprov":true
+		"contprov":true,
+		"contact":true
 	}
 }

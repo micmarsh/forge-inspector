@@ -23,51 +23,73 @@ import io.trigger.forge.android.core.ForgeTask;
 import android.content.Context;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 
 public class API {
 	public static KeyCharacterMap map = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
-
-	public static void typestring(final ForgeTask task, @ForgeParam("input") final String input){
-		final ForgeActivity activity = ForgeApp.getActivity();
-		final KeyEvent[] events = map.getEvents(input.toCharArray());
-		InputMethodManager mgr = getKeyboard(activity);
-		mgr.displayCompletions(activity.webView, null);
-		
-		activity.runOnUiThread(new Runnable(){
-			@Override
-			public void run() {
-				for(KeyEvent e : events)
-					activity.dispatchKeyEvent(e);
-				task.success();
-			}
-		});
-
+	private static class StickyListener implements OnTouchListener{
+		private ForgeTask task;
+		public StickyListener setTask(ForgeTask task){
+			this.task = task;
+			return this;
+		}
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if(event.getAction() == MotionEvent.ACTION_UP) show(task);
+			return false;
+		}
+	}
+	
+	private final static StickyListener KEYBOARD_LISTENER = new StickyListener();
+	
+	public static void stick(final ForgeTask task){
+		try{
+			ForgeApp.getActivity().webView.setOnTouchListener(KEYBOARD_LISTENER.setTask(task));
+			task.success();
+		}catch(Exception e){
+			e.printStackTrace();
+			task.error(e);
+		}
+	}
+	
+	public static void unstick(final ForgeTask task){
+		try{
+			ForgeApp.getActivity().webView.setOnTouchListener(null);
+			task.success();
+		}catch(Exception e){
+			e.printStackTrace();
+			task.error(e);
+		}
 	}
 	
 	public static void show(final ForgeTask task){
+		try{
+			show();
+	        task.success();
+		}catch(Exception e){
+			task.error(e);
+		}
+	}
+	
+	public static void show(){
+			InputMethodManager mgr = getKeyboard();
+	        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED,InputMethodManager.HIDE_IMPLICIT_ONLY);
+	}
+	
+	public static void hide(){
+		InputMethodManager mgr = getKeyboard();
+	    mgr.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+		//ForgeApp.getActivity().getWindow().setSoftInputMode(
+		//	      WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+	}
+		
+	private static InputMethodManager getKeyboard(){
 		ForgeActivity activity = ForgeApp.getActivity();
-		InputMethodManager mgr = getKeyboard(activity);
-        mgr.showSoftInput(activity.webView, InputMethodManager.SHOW_IMPLICIT);
-	}
-	
-	private static final String FOCUS_FUNCTION = "$('#search-notes').focus();console.log('poop');" +
-			"$('#search-notes').caretTo(5)";//"Fetch.editNote.textarea.focus()";
-	
-	public static void focus(final ForgeTask task){
-		final ForgeActivity activity = ForgeApp.getActivity();
-		activity.runOnUiThread(new Runnable(){
-			@Override
-			public void run() {
-				activity.webView.requestFocus(View.FOCUS_DOWN);
-				activity.webView.loadUrl("javascript:"+FOCUS_FUNCTION);
-				show(task);
-				task.success();
-			}
-		});
-	}
-	private static InputMethodManager getKeyboard(ForgeActivity activity){
 		return (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 	}
 }
