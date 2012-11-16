@@ -121,9 +121,7 @@ a){var b=F.exec(a);b&&(b[1]=(b[1]||"").toLowerCase(),b[3]=b[3]&&new RegExp("(?:^
 							$('#_output').prepend('<pre class="alert alert-error">Error for "'+module+'.'+method+'" with "'+JSON.stringify(arguments[0], null, '')+'"</pre>');
 						})
 					});
-					$("#form-horizontal").click(function(){
-						$('#search-notes').focus();
-					});
+					
 				}, function () {
 					alert("Error");
 				});
@@ -153,10 +151,6 @@ $('body').on('touchend', function(e) {
   return console.log("touchended " + e.timeStamp);
 });
 
-$('body').on('click', function(e) {
-	$('#search-notes').focus()
-  return console.log("touchended " + e.timeStamp);
-});
 
 forge.contact.select(function(){
 	console.log('yay success');
@@ -173,7 +167,7 @@ forge.contact.select(function(){
 				<h1>Input  <small>choose an API call to make</small></h1>
 			</div>
 			<textarea id="search-notes" placeholder= "Search Notes" /></textarea>
-			<!--<div class="form-horizontal">
+			<div class="form-horizontal">
 					<div class="control-group">
 						<label class="control-label" for="_module">Module</label>
 						<div class="controls">
@@ -191,7 +185,7 @@ forge.contact.select(function(){
 					<div class="form-actions" id="_actions">
 						<button type="submit" class="btn btn-primary" id="_run">Run!</button>
 					</div>
-			</div>-->
+			</div>
 			<div class="page-header">
 				<h1>Output <small>results from the API call, most recent at the top</small></h1>
 			</div>

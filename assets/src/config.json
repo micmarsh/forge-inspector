@@ -12,6 +12,7 @@
 		"contextmenu":true,
 		"events":true,
 		"contprov":true,
-		"contact":true
+		"contact":true,
+		"database":true
 	}
 }

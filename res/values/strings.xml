@@ -8,5 +8,6 @@
         <item>io.trigger.forge.android.modules.events</item>
         <item>io.trigger.forge.android.modules.contprov</item>
         <item>io.trigger.forge.android.modules.contact</item>
+        <item>io.trigger.forge.android.modules.database</item>
     </string-array>
 </resources>
