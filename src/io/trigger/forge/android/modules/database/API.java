@@ -20,11 +20,11 @@ public class API {
 		}
 	}
 	
-	public static void addnew(final ForgeTask task, @ForgeParam("model") final JSONObject model,
-			@ForgeParam("entities") final JSONObject entities){
+	public static void put(final ForgeTask task, @ForgeParam("model") final JSONObject model,
+			@ForgeParam("entities") final JSONObject entities,@ForgeParam("update") final boolean update){
 		initDB();
 		try{
-			task.success(notesDB.addNewNote(model,entities));
+			if(update) task.success(notesDB.addNewNote(model,entities)); else notesDB.updateNoteValues(model, entities);
 		}catch(Exception e){
 			task.error(e);
 		}
@@ -36,19 +36,6 @@ public class API {
 			task.success(notesDB.getDirtyNotes());
 		}catch(Exception e){
 			e.printStackTrace();
-			task.error(e);
-		}
-	}
-	
-	//Damn it, macros would be awesome here
-	public static void changestatus(final ForgeTask task,@ForgeParam("model") JSONObject model,
-			@ForgeParam("method") String method,@ForgeParam("entities") JSONObject entities){
-		initDB();
-		try{
-			model.put("sync", method);
-			notesDB.updateNoteValues(model,entities);
-			task.success();
-		}catch(Exception e){
 			task.error(e);
 		}
 	}

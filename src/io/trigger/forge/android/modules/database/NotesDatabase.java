@@ -128,13 +128,24 @@ public class NotesDatabase extends FetchDB{
 				model.getString("sync"));
  	}
 	
-	public synchronized int addNewNote(JSONObject model, JSONObject entities) throws JSONException{
+	public synchronized String addNewNote(JSONObject model, JSONObject entities) throws JSONException{
 		if( !db.isOpen() )open();
 		extractAndSetNoteVals(model);
 		String id = ""+db.insertWithOnConflict(TABLE_NAMES[MAIN],null,values,SQLiteDatabase.CONFLICT_IGNORE);
 		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);	
 		if(db.isOpen() && !db.inTransaction())close();
-		return Integer.parseInt(id);
+		return id;
+	}
+	
+	public synchronized String updateNoteValues(JSONObject model, JSONObject entities) throws JSONException{
+		open();
+		extractAndSetNoteVals(model);
+		String id = model.getString("localID");
+		clearNote(id,true);
+		db.update(TABLE_NAMES[MAIN], values, LOC_COL+"='"+id+"'", null);
+		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);
+		close();
+		return id;
 	}
 
 	private void addEntities(JSONArray array,String noteID, int type) throws JSONException{
@@ -193,18 +204,7 @@ public class NotesDatabase extends FetchDB{
 		
 	}
 	
-	public synchronized void updateNoteValues(JSONObject model, JSONObject entities) throws JSONException{
-		open();
-		extractAndSetNoteVals(model);
-		String id = model.getString("localID");
-		Log.e("err","local id!: "+id);
-		Log.e("err","Values being updated: "+ values.toString());
-		clearNote(id,true);
-		int row = db.update(TABLE_NAMES[MAIN], values, LOC_COL+"='"+id+"'", null);
-		Log.e("err","number of rows affected: "+row);
-		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);
-		close();
-	}
+	
 	
 	private void clearNote(String id,boolean justEntities){
 		final String whereClause = LOC_COL+"='"+id+'\'';;
