@@ -82,6 +82,7 @@ public class NotesDatabase extends FetchDB{
 	public NotesDatabase(Context context) {
 		super(context,TABLE_NAMES[MAIN]);
 		Log.e("woot woot","called constructor!");
+		reset();
 		open();//won't be created until we do this!
 		close();
 	}
@@ -128,12 +129,13 @@ public class NotesDatabase extends FetchDB{
 				model.getString("sync"));
  	}
 	
-	public synchronized void addNewNote(JSONObject model, JSONObject entities) throws JSONException{
+	public synchronized int addNewNote(JSONObject model, JSONObject entities) throws JSONException{
 		if( !db.isOpen() )open();
 		extractAndSetNoteVals(model);
 		String id = ""+db.insertWithOnConflict(TABLE_NAMES[MAIN],null,values,SQLiteDatabase.CONFLICT_IGNORE);
 		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);	
 		if(db.isOpen() && !db.inTransaction())close();
+		return Integer.parseInt(id);
 	}
 
 	private void addEntities(JSONArray array,String noteID, int type) throws JSONException{
@@ -163,7 +165,6 @@ public class NotesDatabase extends FetchDB{
 	
 	public JSONArray getDirtyNotes() throws JSONException{
 			open();
-			System.out.println("le query!: "+DIRTY_NOTES_QUERY);
 			Cursor c = db.rawQuery(DIRTY_NOTES_QUERY,null);//Database query
 			JSONArray toRet = extractNotesFromCursor(c);
 			c.close();
@@ -190,25 +191,19 @@ public class NotesDatabase extends FetchDB{
 		
 		return toRet;
 		
+		
 	}
 	
 	public synchronized void updateNoteValues(JSONObject model, JSONObject entities) throws JSONException{
 		open();
 		extractAndSetNoteVals(model);
 		String id = model.getString("localID");
+		Log.e("err","local id!: "+id);
+		Log.e("err","Values being updated: "+ values.toString());
 		clearNote(id,true);
-		db.update(TABLE_NAMES[MAIN], values, LOC_COL+"='"+id+"'", null);
-		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);		
-		/*
-		String id = note.getLocalID();
-		Log.e("NotesDatabase updateNoteValues","local_id: "+note.getLocalID()+" server_id: "+note.getServerID());
-		clearNote(id,true);//disassocitate all entities from this note
-		setNoteVals(newText,Parser.addHtml(newText),
-				server_id==null?note.getServerID():server_id,
-				timestamp==null?Notes.getDate():timestamp);
-		Log.e("updateNotes ",values.toString());
-		db.update(TABLE_NAMES[MAIN], values, LOC_COL+"='"+id+"'", null);
-		addEntities(newText, id);//re-add new entities*/
+		int row = db.update(TABLE_NAMES[MAIN], values, LOC_COL+"='"+id+"'", null);
+		Log.e("err","number of rows affected: "+row);
+		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);
 		close();
 	}
 	

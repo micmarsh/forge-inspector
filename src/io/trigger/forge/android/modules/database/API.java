@@ -24,8 +24,7 @@ public class API {
 			@ForgeParam("entities") final JSONObject entities){
 		initDB();
 		try{
-			notesDB.addNewNote(model,entities);
-			task.success();
+			task.success(notesDB.addNewNote(model,entities));
 		}catch(Exception e){
 			task.error(e);
 		}
@@ -38,8 +37,7 @@ public class API {
 		}catch(Exception e){
 			e.printStackTrace();
 			task.error(e);
-		}	
-		
+		}
 	}
 	
 	//Damn it, macros would be awesome here
@@ -59,6 +57,15 @@ public class API {
 		initDB();
 		try{
 			
+		}catch(Exception e){
+			task.error(e);
+		}
+	}
+	
+	public static void wipe(final ForgeTask task){
+		initDB();
+		try{
+			notesDB.reset();
 		}catch(Exception e){
 			task.error(e);
 		}
