@@ -82,7 +82,6 @@ public class NotesDatabase extends FetchDB{
 	public NotesDatabase(Context context) {
 		super(context,TABLE_NAMES[MAIN]);
 		Log.e("woot woot","called constructor!");
-		reset();
 		open();//won't be created until we do this!
 		close();
 	}

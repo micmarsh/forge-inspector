@@ -7,6 +7,7 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
+			forge.internal.call( 'database.wipe',{})
 			forge.internal.addEventListener("alert.resume", function () {
 				alert("Weclome back!");
 			});
@@ -53,7 +54,8 @@ FetchDB = (function() {
       model = args.model;
       return forge.internal.call('database.addnew', this.prepNativeCall(model), function(id) {
         console.log('note saved!');
-        return model.localID = id;
+        model.localID = id;
+        DB.updateLocal({"model":model});
       }, function(e) {
         return console.log('big problem');
       });
@@ -62,17 +64,16 @@ FetchDB = (function() {
 
   FetchDB.prototype.updateLocal = function(args) {
     var object;
-    object = _.extend(this.prepNativeCall(args.model, {
+    object = _.extend(this.prepNativeCall(args.model), {
       method: 'synced'
-    }));
+    });
     console.log(JSON.stringify(object));
-    return forge.internal.call('database.changestatus', _.extend(this.prepNativeCall(args.model), {
-      method: 'synced'
-    }, function(success) {
+    return forge.internal.call('database.changestatus', object
+    , function(success) {
       return console.log('woot!');
     }, function(e) {
       return console.log('poop!');
-    }));
+    });
   };
 
   return FetchDB;
@@ -82,10 +83,9 @@ FetchDB = (function() {
 
 var DB = new FetchDB();
 
-DB.localSave({"model":{"text":"POOP","html":"<p>POOP</p>","lastModified":"2012-11-17T01:18:41.542000","visible":true,"localID":"3","sync":"create","id":"50a6e5f129d3690c8600084f"}});
+//DB.localSave({"model":{"text":"POOP","html":"<p>POOP</p>","lastModified":"2012-11-17T01:18:41.542000","visible":true,"localID":"3","sync":"create","id":"50a6e5f129d3690c8600084f"}});
 var model = {"text":"Foop","html":"<p>Foop</p>","lastModified":"2012-11-17T01:09:05.464000","visible":true,"localID":"6","sync":"create","id":"50a6e3b129d3690ca70007da"};
-DB.localSave({"model":model});
-DB.updateLocal({"model":model});		
+DB.localSave({"model":model});	
 			(function ($) {
     // Behind the scenes method deals with browser
     // idiosyncrasies and such
