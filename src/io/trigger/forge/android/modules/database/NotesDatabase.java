@@ -143,15 +143,17 @@ public class NotesDatabase extends FetchDB{
 	public synchronized String updateNoteValues(JSONObject model, JSONObject entities) throws JSONException{
 		open();
 		extractAndSetNoteVals(model);
-		
-		String id = model.getString(model.has("localID")?"localID"://If this model doesn't have a localID, it must be a direct
-			getID(model.getString("id"),true));// translation of a server note, so we can look up its localID
-		
+		String id = getLocalID(model);
 		clearNote(id,true);
 		db.update(TABLE_NAMES[MAIN], values, LOC_COL+"='"+id+"'", null);
 		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);
 		close();
 		return id;
+	}
+	
+	private String getLocalID(JSONObject model) throws JSONException{
+		return model.getString(model.has("localID")?"localID"://If this model doesn't have a localID, it must be a direct
+			getID(model.getString("id"),true));// translation of a server note, so we can look up its localID
 	}
 
 	private void addEntities(JSONArray array,String noteID, int type) throws JSONException{
