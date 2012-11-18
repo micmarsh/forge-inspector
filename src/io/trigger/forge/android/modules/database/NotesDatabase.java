@@ -249,7 +249,7 @@ public class NotesDatabase extends FetchDB{
 				(getLoc?"'":"")+id+
 				(getLoc?"'":"");
 		Cursor c = db.rawQuery(query,null);//get the needed id, if it exists
-		if(!c.moveToFirst()){close();return null;}//if nothing found, nothing to return
+		if(!c.moveToFirst()){c.close();return null;}//if nothing found, nothing to return
 		int col = c.getColumnIndex(selectID);
 		String toRet = (col == -1?null:
 			(getLoc?c.getInt(col)+""://the ids are different data types

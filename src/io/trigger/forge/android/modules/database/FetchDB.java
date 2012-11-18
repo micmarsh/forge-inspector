@@ -23,6 +23,18 @@ public abstract class FetchDB extends SQLiteOpenHelper {
 	}
 	
 	
+	@Override
+	public
+	synchronized void close(){
+		try {
+			throw new Exception();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.close();
+	}
+	
+	
 	
 
 }
