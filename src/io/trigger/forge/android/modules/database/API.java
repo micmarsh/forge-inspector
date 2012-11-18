@@ -44,10 +44,11 @@ public class API {
 		}
 	}
 	
-	public static void getnext(final ForgeTask task){
+	public static void getnext(final ForgeTask task, @ForgeParam("start") final int start,
+			@ForgeParam("chunkSize") final int chunkSize){
 		initDB();
 		try{
-			
+			task.success(notesDB.getNextNotes(start, chunkSize));
 		}catch(Exception e){
 			task.error(e);
 		}

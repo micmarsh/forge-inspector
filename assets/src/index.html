@@ -25,13 +25,6 @@ FetchDB = (function() {
 
   FetchDB.name = 'FetchDB';
 
-  function FetchDB() {
-    this.updateLocal = __bind(this.updateLocal, this);
-
-    this.localSave = __bind(this.localSave, this);
-
-  }
-
   FetchDB.prototype.prepNativeCall = function(model) {
     var object, text;
     text = model.text;
@@ -51,7 +44,7 @@ FetchDB = (function() {
     };
   };
 
-    FetchDB.prototype.localSave = function(args) {
+  FetchDB.prototype.localSave = function(args) {
     var model, object;
     if (window.forge) {
       model = args.model;
@@ -76,16 +69,68 @@ FetchDB = (function() {
       response = data.response || JSON.parse(data).response;
       model.set(this.translateServerNote(response));
     }
-    if (method) model.sync = method
+    if (method) model['sync'] = method;
     return this.localSave({
       model: model,
       update: true
     });
   };
 
+  function FetchDB() {
+    this.getAllNotes = __bind(this.getAllNotes, this);
+
+    this.deleteLocal = __bind(this.deleteLocal, this);
+
+    this.updateLocal = __bind(this.updateLocal, this);
+
+    this.localSave = __bind(this.localSave, this);
+    this.CHUNK_SIZE = 25;
+    this.startIndex = 0;
+  }
+
+  FetchDB.prototype.deleteLocal = function(args) {
+    return console.log("deleteLocal");
+  };
+
+  FetchDB.prototype.getNextNotes = function(success) {
+    var _this = this;
+    if (window.forge) {
+      return forge.internal.call('database.getnext', {
+        start: this.startIndex,
+        chunkSize: this.CHUNK_SIZE
+      }, function(notes) {
+        success(notes);
+        return _this.startIndex += _this.CHUNK_SIZE;
+      });
+    }
+  };
+
+  FetchDB.prototype.getDirtyNotes = function(success) {
+    var _this = this;
+    if (window.forge) {
+      return forge.internal.call('database.getdirty', {}, function(notes) {
+        return success(notes);
+      });
+    }
+  };
+
+  FetchDB.prototype.getAllNotes = function() {
+    return _.union(this.getSyncedNotes(), this.getDirtyNotes());
+  };
+
+  FetchDB.prototype.translateServerNote = function(note) {
+    return {
+      text: note.text,
+      lastModified: note.timestamp,
+      id: note._id,
+      deleted: note.state === 'deleted' || note.state === 'unsubscribed'
+    };
+  };
+
   return FetchDB;
 
 })();
+
 
 
 var DB = new FetchDB();

@@ -64,7 +64,6 @@ public class NotesDatabase extends FetchDB{
 	static final String SELECT_ALL = "select * from ";
 	
 	
-	
 	static String[] initSelectDistinct(){
 		String[] toRet = new String[5];
 		for(int i = TAGS; i <= URLS;i++)
@@ -76,6 +75,10 @@ public class NotesDatabase extends FetchDB{
 	static final String[] SELECT_DISTINCT = initSelectDistinct();
 	
 	static final String ALL_NOTES_QUERY = SELECT_ALL+TABLE_NAMES[MAIN];
+	
+	static final String SELECT_PIECE_PREFIX = "select distinct * from "+TABLE_NAMES[MAIN]+
+			 " where "+STATUS_COL+" == "+"'synced' "+
+			" order by "+TIME_COL+" desc ";
 	
 	static final String DIRTY_NOTES_QUERY = ALL_NOTES_QUERY+" where "+STATUS_COL+" != "+"'synced';";
 	
@@ -174,12 +177,29 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	public JSONArray getDirtyNotes() throws JSONException{
-			open();
-			Cursor c = db.rawQuery(DIRTY_NOTES_QUERY,null);//Database query
-			JSONArray toRet = extractNotesFromCursor(c);
-			c.close();
-			close();
+			JSONArray toRet = queryToNotes(DIRTY_NOTES_QUERY);
 			return toRet;
+	}
+	
+	public synchronized JSONArray getNextNotes(int start, int chunkSize) throws JSONException{
+		JSONArray toRet = queryToNotes(getNextQuery(start,chunkSize));
+		return toRet;
+		
+	}
+	
+	private String getNextQuery(int start, int chunkSize){
+		String toRet = SELECT_PIECE_PREFIX +" limit "+start+','+chunkSize;
+		return toRet;
+	}
+	
+	
+	private synchronized JSONArray queryToNotes(String query) throws JSONException{
+		open();
+		Cursor c = db.rawQuery(query, null);
+		JSONArray notes = extractNotesFromCursor(c);
+		c.close();
+		close();
+		return notes;
 	}
 	
 	private JSONArray extractNotesFromCursor(Cursor c) throws JSONException{
@@ -191,7 +211,7 @@ public class NotesDatabase extends FetchDB{
 		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){//Extract note from cursor 
 			System.out.println("woot note: "+c.getString(cIndices[TEXT]));
 			toRet.put(new JSONObject()
-						.put("text",c.getString(cIndices[TEXT]))
+						.put("text",c.getString(cIndices[TEXT]))	
 						.put("html",c.getString(cIndices[HTML]))
 						.put("localID",c.getString(cIndices[LOCAL_ID]))
 						.put("lastModified",c.getString(cIndices[TIMESTAMP]))
@@ -358,24 +378,12 @@ public class NotesDatabase extends FetchDB{
 	public static final int CHUNK_SIZE = 25;
 	
 	
-	static final String SELECT_PIECE_PREFIX = "select distinct * from "+TABLE_NAMES[MAIN]+" order by "+TIME_COL+" desc ";
 	
 	int cur_index = 0;
 	
-	private String getNextQuery(){
-		String toRet = SELECT_PIECE_PREFIX +" limit "+cur_index+','+CHUNK_SIZE;
-		cur_index += CHUNK_SIZE;
-		return toRet;
-	}
 	
 	
-	public synchronized Note[] getNextNotes(){
-		Note[] toRet = queryToNotes(getNextQuery());
-		CommonFunctions.sortNotes(toRet);
-		if(toRet.length == 0)resetNextNotes();
-		return toRet;
-		
-	}
+	
 	
 	public void resetNextNotes(){
 		//CommonFunctions.showStackTrace();
@@ -539,14 +547,7 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	
-	private synchronized Note[] queryToNotes(String query){
-		open();
-		Cursor c = db.rawQuery(query, null);
-		Note[] notes = extractNotesFromCursor(c);
-		c.close();
-		close();
-		return notes;
-	}
+	
 	
 
 	 
