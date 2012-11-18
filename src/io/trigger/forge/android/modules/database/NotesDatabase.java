@@ -143,7 +143,10 @@ public class NotesDatabase extends FetchDB{
 	public synchronized String updateNoteValues(JSONObject model, JSONObject entities) throws JSONException{
 		open();
 		extractAndSetNoteVals(model);
-		String id = model.getString("localID");
+		
+		String id = model.getString(model.has("localID")?"localID"://If this model doesn't have a localID, it must be a direct
+			getID(model.getString("id"),true));// translation of a server note, so we can look up its localID
+		
 		clearNote(id,true);
 		db.update(TABLE_NAMES[MAIN], values, LOC_COL+"='"+id+"'", null);
 		for(int i = TAGS; i <= URLS; i++) addEntities(entities.getJSONArray(entityStrings[i]),id,i);
@@ -232,6 +235,28 @@ public class NotesDatabase extends FetchDB{
 		for(int i = justEntities?TAGS:MAIN; i < TABLE_ENUMS.length;i++)
 			db.delete(TABLE_NAMES[TABLE_ENUMS[i]], whereClause, null);
 	}
+	
+	private  synchronized String getID(String id, boolean getLoc){
+		open();
+		String selectID = (getLoc?LOC_COL:SERV_COL) ;
+		String query = "select "+
+				selectID+
+				" from "+TABLE_NAMES[MAIN]+" where "+
+				(getLoc?SERV_COL:LOC_COL)+
+				"=" +
+				(getLoc?"'":"")+id+
+				(getLoc?"'":"");
+		Cursor c = db.rawQuery(query,null);//get the needed id, if it exists
+		if(!c.moveToFirst()){close();return null;}//if nothing found, nothing to return
+		int col = c.getColumnIndex(selectID);
+		String toRet = (col == -1?null:
+			(getLoc?c.getInt(col)+""://the ids are different data types
+				c.getString(col)));
+		c.close();
+		close();
+		return toRet;	
+	}
+	
 /*	public synchronized Note addNewNote(String text,String server_id,String timestamp  ){
 		if(!db.isOpen() )open();
 		
@@ -502,39 +527,7 @@ public class NotesDatabase extends FetchDB{
 		return getAssocTags(asList);
 	}
 	
-	private  synchronized String getID(String id, boolean getLoc){
-	
 
-		open();
-		
-		String selectID = (getLoc?LOC_COL:SERV_COL) ;
-		String query = "select "+
-				selectID+
-				" from "+TABLE_NAMES[MAIN]+" where "+
-				(getLoc?SERV_COL:LOC_COL)+
-				"=" +
-				(getLoc?"'":"")+id+
-				(getLoc?"'":"");
-			
-		
-		Cursor c = db.rawQuery(query,null);//get the needed id, if it exists
-		
-		
-		if(!c.moveToFirst()){close();return null;}//if nothing found, nothing to return
-		
-		int col = c.getColumnIndex(selectID);
-		
-		String toRet = (col == -1?null:
-			(getLoc?c.getInt(col)+""://the ids are different data types
-				c.getString(col)));
-		
-		c.close();
-		close();
-		
-		return toRet;
-			
-		
-	}
 
 	public synchronized String getLocID(String server_id){
 		return getID(server_id,true);
