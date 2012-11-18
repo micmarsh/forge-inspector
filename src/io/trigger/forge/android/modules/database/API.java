@@ -30,6 +30,7 @@ public class API {
 			}else 
 				task.success(notesDB.addNewNote(model,entities));
 		}catch(Exception e){
+			e.printStackTrace();
 			task.error(e);
 		}
 	}

@@ -148,6 +148,12 @@ DB.localSave({"model":model3});
 
 setTimeout(function(){
 	alert('wtf');
+	
+delete model1.localID;
+delete model3.localID;
+	
+	console.log(JSON.stringify(model1));
+	console.log(JSON.stringify(model3));
 	DB.updateLocal({"model":model,'method':'synced'});
 	DB.updateLocal({"model":model1,'method':'synced'});
 	DB.updateLocal({"model":model3,'method':'synced'});

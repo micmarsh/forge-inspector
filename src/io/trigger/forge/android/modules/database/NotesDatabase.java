@@ -152,8 +152,8 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	private String getLocalID(JSONObject model) throws JSONException{
-		return model.getString(model.has("localID")?"localID"://If this model doesn't have a localID, it must be a direct
-			getID(model.getString("id"),true));// translation of a server note, so we can look up its localID
+		if(model.has("localID")) return model.getString("localID");//If this model doesn't have a localID, it must be a direct
+		else return getID(model.getString("id"),true);// translation of a server note, so we can look up its localID
 	}
 
 	private void addEntities(JSONArray array,String noteID, int type) throws JSONException{
@@ -238,8 +238,8 @@ public class NotesDatabase extends FetchDB{
 			db.delete(TABLE_NAMES[TABLE_ENUMS[i]], whereClause, null);
 	}
 	
+	//Database must be open for this to work out
 	private  synchronized String getID(String id, boolean getLoc){
-		open();
 		String selectID = (getLoc?LOC_COL:SERV_COL) ;
 		String query = "select "+
 				selectID+
@@ -255,7 +255,6 @@ public class NotesDatabase extends FetchDB{
 			(getLoc?c.getInt(col)+""://the ids are different data types
 				c.getString(col)));
 		c.close();
-		close();
 		return toRet;	
 	}
 	
