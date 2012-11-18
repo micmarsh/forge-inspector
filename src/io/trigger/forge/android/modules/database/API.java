@@ -24,7 +24,11 @@ public class API {
 			@ForgeParam("entities") final JSONObject entities,@ForgeParam("update") final boolean update){
 		initDB();
 		try{
-			if(update) task.success(notesDB.addNewNote(model,entities)); else notesDB.updateNoteValues(model, entities);
+			if(update){ 
+				notesDB.updateNoteValues(model, entities); 
+				task.success();
+			}else 
+				task.success(notesDB.addNewNote(model,entities));
 		}catch(Exception e){
 			task.error(e);
 		}

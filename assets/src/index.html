@@ -7,6 +7,7 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
+			forge.internal.call('database.wipe',{})
 			forge.internal.addEventListener("alert.resume", function () {
 				alert("Weclome back!");
 			});
@@ -21,16 +22,19 @@ var FetchDB,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 FetchDB = (function() {
+
   FetchDB.name = 'FetchDB';
 
   function FetchDB() {
+    this.updateLocal = __bind(this.updateLocal, this);
+
     this.localSave = __bind(this.localSave, this);
 
   }
 
   FetchDB.prototype.prepNativeCall = function(model) {
     var object, text;
-    text = model.text
+    text = model.text;
     if (!model.html) {
       model.set({
         html: Fetch.displayHTML(model.get('text'))
@@ -39,22 +43,24 @@ FetchDB = (function() {
     return object = {
       model: model,
       entities: {
-        tag: [],//Fetch.findTags(text),
-        contact: [],//Fetch.findContacts(text),
-        email: [],//Fetch.findEmails(text),
-        url: []//Fetch.findUrls(text)
+        tag: [],
+        contact: [],
+        email: [],
+        url: []
       }
     };
   };
 
-  FetchDB.prototype.localSave = function(args) {
-    var model;
+    FetchDB.prototype.localSave = function(args) {
+    var model, object;
     if (window.forge) {
       model = args.model;
-      return forge.internal.call('database.addnew', this.prepNativeCall(model), function(id) {
+      object = _.extend(this.prepNativeCall(model), {
+        update: Boolean(args.update)
+      });
+      return forge.internal.call('database.put', object, function(id) {
         console.log('note saved!');
-        model.localID = id;
-        DB.updateLocal({"model":model});
+        return model.localID = id;
       }, function(e) {
         return console.log('big problem');
       });
@@ -62,29 +68,48 @@ FetchDB = (function() {
   };
 
   FetchDB.prototype.updateLocal = function(args) {
-    var object;
-    object = _.extend(this.prepNativeCall(args.model), {
-      method: 'synced'
-    });
-    console.log(JSON.stringify(object));
-    return forge.internal.call('database.changestatus', object
-    , function(success) {
-      return console.log('woot!');
-    }, function(e) {
-      return console.log('poop!');
+    var data, method, model, response;
+    method = args.method;
+    data = args.data;
+    model = args.model;
+    if (data) {
+      response = data.response || JSON.parse(data).response;
+      model.set(this.translateServerNote(response));
+    }
+    if (method) model.sync = method
+    return this.localSave({
+      model: model,
+      update: true
     });
   };
 
   return FetchDB;
 
 })();
-		
+
 
 var DB = new FetchDB();
 
-//DB.localSave({"model":{"text":"POOP","html":"<p>POOP</p>","lastModified":"2012-11-17T01:18:41.542000","visible":true,"localID":"3","sync":"create","id":"50a6e5f129d3690c8600084f"}});
 var model = {"text":"Foop","html":"<p>Foop</p>","lastModified":"2012-11-17T01:09:05.464000","visible":true,"localID":"6","sync":"create","id":"50a6e3b129d3690ca70007da"};
+var model1 = {"text":"#poop","html":"<p><span class=\"tag\">#poop</span></p>","lastModified":"2012-11-17T01:12:58.742000","visible":true,"localID":"5","sync":"create","id":"50a6e49a29d3690c9c000830"};
+var model2 = {"text":"Woot woot","html":"<p>Woot woot</p>","lastModified":"2012-11-17T01:15:33.737000","visible":true,"localID":"4","sync":"create","id":"50a6e53529d3690c8600084e"};
+
 DB.localSave({"model":model});	
+DB.localSave({"model":model1});	
+DB.localSave({"model":model2});
+
+setTimeout(function(){
+	alert('wtf');
+	DB.updateLocal({"model":model,'method':'synced'});
+	DB.updateLocal({"model":model1,'method':'delete'});
+},1000);	
+
+
+
+
+
+
+
 			(function ($) {
     // Behind the scenes method deals with browser
     // idiosyncrasies and such
@@ -207,24 +232,8 @@ DB.localSave({"model":model});
 				// 	}
 				// });
 				
-$('#search-notes').on('blur', function(e) {
-  return console.log("blurred " + e.timeStamp);
-});
-
-$('body').on('tap', function(e) {
-  return console.log("tapped " + e.timeStamp);
-});
-
-$('body').on('touchend', function(e) {
-  return console.log("touchended " + e.timeStamp);
-});
 
 
-forge.contact.select(function(){
-	console.log('yay success');
-},function(){
-	console.log('yay error');
-});
 				
 			});
 		</script>
