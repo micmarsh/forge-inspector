@@ -214,7 +214,6 @@ public class NotesDatabase extends FetchDB{
 		for(int i = 0; i < NOTE_COLS.length;i++)cIndices[i] = c.getColumnIndex(NOTE_COLS[i]);//Find the indices of each column in the curso
 		
 		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){//Extract note from cursor 
-			System.out.println("woot note: "+c.getString(cIndices[TEXT]));
 			toRet.put(new JSONObject()
 						.put("text",c.getString(cIndices[TEXT]))	
 						.put("html",c.getString(cIndices[HTML]))
@@ -223,7 +222,8 @@ public class NotesDatabase extends FetchDB{
 						.put("id", c.getString(cIndices[SERVER_ID]))
 						.put("sync", c.getString(cIndices[STATUS])));
 		}
-		
+		for(int i =0; i < toRet.length();i++)
+			System.out.println("woot note: "+toRet.getJSONObject(i).getString("text"));
 		return toRet;
 		
 		

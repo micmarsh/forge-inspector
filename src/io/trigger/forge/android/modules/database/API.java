@@ -21,9 +21,12 @@ public class API {
 	}
 	
 	public static void put(final ForgeTask task, @ForgeParam("model") final JSONObject model,
-			@ForgeParam("entities") final JSONObject entities,@ForgeParam("update") final boolean update){
+			@ForgeParam("entities") final JSONObject entities){
 		initDB();
 		try{
+			final String id = model.getString("id");
+			final boolean update = !(id.startsWith("c") && id.length() < 10);
+			//Determines whether or not the note has touched the database before
 			if(update){ 
 				notesDB.updateNoteValues(model, entities); 
 				task.success();

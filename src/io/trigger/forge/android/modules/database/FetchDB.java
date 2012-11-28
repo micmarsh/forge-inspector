@@ -23,7 +23,7 @@ public abstract class FetchDB extends SQLiteOpenHelper {
 	}
 	
 	
-	@Override
+	/*@Override
 	public
 	synchronized void close(){
 		try {
@@ -32,7 +32,7 @@ public abstract class FetchDB extends SQLiteOpenHelper {
 			e.printStackTrace();
 		}
 		super.close();
-	}
+	}*/
 	
 	
 	
