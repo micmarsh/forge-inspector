@@ -14,6 +14,7 @@ public class API {
 	
 	private static void initDB(){
 		Log.e("init notesdb: ","INITING NOTES DB");
+		
 		if(notesDB == null){
 			Log.e("init notesdb: ","FO REALS");
 			notesDB = new NotesDatabase(ForgeApp.getActivity());
@@ -24,8 +25,13 @@ public class API {
 			@ForgeParam("entities") final JSONObject entities){
 		initDB();
 		try{
-			final String id = model.getString("id");
-			final boolean update = !(id.startsWith("c") && id.length() < 10);
+			System.out.println("**********yay model!!!!!!!!!!!!!! "+model.toString());
+			boolean update;
+			if(model.has("localID")){
+				final String id = model.getString("localID");
+				update = !id.startsWith("c");
+			}else//model is something pulled straight in from server
+				update = true;
 			//Determines whether or not the note has touched the database before
 			if(update){ 
 				notesDB.updateNoteValues(model, entities); 
