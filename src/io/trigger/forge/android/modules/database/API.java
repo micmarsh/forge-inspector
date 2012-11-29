@@ -26,18 +26,30 @@ public class API {
 		initDB();
 		try{
 			System.out.println("**********yay model!!!!!!!!!!!!!! "+model.toString());
+			
 			boolean update;
 			if(model.has("localID")){
 				final String id = model.getString("localID");
 				update = !id.startsWith("c");
 			}else//model is something pulled straight in from server
 				update = true;
-			//Determines whether or not the note has touched the database before
+			
 			if(update){ 
 				notesDB.updateNoteValues(model, entities); 
 				task.success();
 			}else 
 				task.success(notesDB.addNewNote(model,entities));
+		}catch(Exception e){
+			e.printStackTrace();
+			task.error(e);
+		}
+	}
+	
+	public static void delete(final ForgeTask task, @ForgeParam("model") final JSONObject model){
+		initDB();
+		try{
+			notesDB.deleteNote(model);
+			task.success();
 		}catch(Exception e){
 			e.printStackTrace();
 			task.error(e);

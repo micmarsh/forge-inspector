@@ -229,7 +229,12 @@ public class NotesDatabase extends FetchDB{
 		
 	}
 	
-	
+	public synchronized void deleteNote(JSONObject note) throws JSONException{
+		open();
+		clearNote(note.has("localID")?note.getString("localID"):
+			getID(note.getString("id"),true),false);
+		close();
+	}
 	
 	private void clearNote(String id,boolean justEntities){
 		final String whereClause = LOC_COL+"='"+id+'\'';;
@@ -494,12 +499,7 @@ public class NotesDatabase extends FetchDB{
 
 
 	
-	public synchronized void deleteNote(Note note) {
-		open();
-		clearNote(note.getLocalID(),false);
-		close();
-	}
-	
+
 	
 
 	public synchronized String[] getAssocTagsList(String[] tags) {
