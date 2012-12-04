@@ -33,7 +33,7 @@ public class API {
 			if(mLength != eLength) 
 				throw new Exception("Array lengths not equal");
 			for(int i = 0; i < mLength;i++){
-				addWithoutInit(task, models.getJSONObject(i), models.getJSONObject(i), results);
+				addWithoutInit(task, models.getJSONObject(i), entities.getJSONObject(i), results);
 			}
 			task.success(results);
 		}catch(Exception e){
