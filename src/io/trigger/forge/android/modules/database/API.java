@@ -26,14 +26,16 @@ public class API {
 	public static void put(final ForgeTask task, @ForgeParam("models") final JSONArray models,
 			@ForgeParam("entities") final JSONArray entities){
 		initDB();
+		JSONArray results = new JSONArray();
 		try{
 			int mLength = models.length(),
 				eLength = entities.length();
 			if(mLength != eLength) 
 				throw new Exception("Array lengths not equal");
 			for(int i = 0; i < mLength;i++){
-				addWithoutInit(task, models.getJSONObject(i), models.getJSONObject(i));
+				addWithoutInit(task, models.getJSONObject(i), models.getJSONObject(i), results);
 			}
+			task.success(results);
 		}catch(Exception e){
 			e.printStackTrace();
 			task.error(e);
@@ -50,9 +52,12 @@ public class API {
 			task.error(e);
 		}
 	}
-	
 	private static void addWithoutInit(final ForgeTask task, @ForgeParam("model") final JSONObject model,
 			@ForgeParam("entities") final JSONObject entities) throws JSONException{
+		addWithoutInit(task, model, entities, null);
+	}
+	private static void addWithoutInit(final ForgeTask task, @ForgeParam("model") final JSONObject model,
+			@ForgeParam("entities") final JSONObject entities,final JSONArray results) throws JSONException{
 		System.out.println("**********yay model!!!!!!!!!!!!!! "+model.toString());
 		
 		boolean update;
@@ -65,8 +70,13 @@ public class API {
 		if(update){ 
 			notesDB.updateNoteValues(model, entities); 
 			task.success();
-		}else 
-			task.success(notesDB.addNewNote(model,entities));
+		}else{
+			String id = notesDB.addNewNote(model,entities);
+			if(results != null)
+				results.put(id);
+			else
+				task.success(id);
+		}
 	}
 	
 	public static void delete(final ForgeTask task, @ForgeParam("model") final JSONObject model){
