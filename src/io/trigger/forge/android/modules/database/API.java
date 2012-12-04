@@ -23,17 +23,17 @@ public class API {
 		}
 	}
 	
-	public static void addBatch(final ForgeTask task, @ForgeParam("models") final JSONArray models,
+	public static void put(final ForgeTask task, @ForgeParam("models") final JSONArray models,
 			@ForgeParam("entities") final JSONArray entities){
 		initDB();
 		try{
 			int mLength = models.length(),
 				eLength = entities.length();
-			if(mLength != eLength) throw new Exception("Array lengths not equal");
+			if(mLength != eLength) 
+				throw new Exception("Array lengths not equal");
 			for(int i = 0; i < mLength;i++){
 				addWithoutInit(task, models.getJSONObject(i), models.getJSONObject(i));
 			}
-			
 		}catch(Exception e){
 			e.printStackTrace();
 			task.error(e);
