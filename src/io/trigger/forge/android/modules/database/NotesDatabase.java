@@ -301,10 +301,10 @@ public class NotesDatabase extends FetchDB{
 				+" from "+TABLE_NAMES[TAGS]
 					+" where "+
 				(noteByTag?TAG_COL:LOC_COL)
-				+"="+'\''+s+'\'');//switch the two "COL"'s!
+				+" == "+'\''+s+'\'');//switch the two "COL"'s!
 		}
 		Log.e("NotesDatabase query getSetBySet",query.toString());
-		return query.toString();
+		return query.toString()+';';
 	}
 	
 	private String[] getSetBySet(JSONArray set,boolean noteByTag) throws JSONException{
@@ -312,7 +312,7 @@ public class NotesDatabase extends FetchDB{
 		Cursor c = db.rawQuery(buildFetchQuery(set,noteByTag),null);//this would need to be changed (see above)
 		
 		String[] toRet = new String[c.getCount()];
-		
+		System.out.println("amount returned: "+c.getCount());
 		int col = c.getColumnIndex(noteByTag?LOC_COL:TAG_COL);//this need to be TAG_COL
 		
 		int i = 0;
