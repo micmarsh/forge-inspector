@@ -222,8 +222,8 @@ public class NotesDatabase extends FetchDB{
 						.put("id", c.getString(cIndices[SERVER_ID]))
 						.put("sync", c.getString(cIndices[STATUS])));
 		}
-		for(int i =0; i < toRet.length();i++)
-			System.out.println("woot note: "+toRet.getJSONObject(i).getString("text"));
+		//for(int i =0; i < toRet.length();i++)
+		//	System.out.println("woot note: "+toRet.getJSONObject(i).getString("text"));
 		return toRet;
 		
 		
@@ -262,6 +262,31 @@ public class NotesDatabase extends FetchDB{
 		c.close();
 		return toRet;	
 	}
+	
+	
+
+	private JSONArray getEntities(int type){
+		if(!db.isOpen())open();
+		Cursor c = db.rawQuery(SELECT_DISTINCT[type],null);//SELECT_DISTINCT[type], null);
+		
+		JSONArray toRet = new JSONArray();
+		
+		int col = c.getColumnIndex(entityStrings[type]);
+		
+		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
+			toRet.put(c.getString(col));
+		}
+		
+		c.close();
+		if(db.isOpen())close();
+		return toRet;
+	}
+	
+	 
+	public synchronized JSONArray getTags() {
+		return getEntities(TAGS);
+	}
+	
 	
 /*	public synchronized Note addNewNote(String text,String server_id,String timestamp  ){
 		if(!db.isOpen() )open();
@@ -449,31 +474,6 @@ public class NotesDatabase extends FetchDB{
 
 		return toRet;
 		
-	}
-	
-	private String[] getEntities(int type){
-		if(!db.isOpen())open();
-		Cursor c = db.rawQuery(SELECT_DISTINCT[type], null);
-		
-		String[] toRet = new String[c.getCount()];
-		
-		int col = c.getColumnIndex(entityStrings[type]);
-		
-		int i = 0;
-		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
-			toRet[i] = c.getString(col);
-			i++;
-		}
-		
-		
-		c.close();
-		if(db.isOpen())close();
-		return toRet;
-	}
-	
-	 
-	public synchronized String[] getTags() {
-		return getEntities(TAGS);
 	}
 	
 

@@ -1,5 +1,6 @@
 package io.trigger.forge.android.modules.database;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.util.Log;
@@ -71,6 +72,24 @@ public class API {
 		initDB();
 		try{
 			task.success(notesDB.getNextNotes(start, chunkSize));
+		}catch(Exception e){
+			task.error(e);
+		}
+	}
+	
+	public static void getAllTags(final ForgeTask task){
+		initDB();
+		try{
+			task.success(notesDB.getTags());
+		}catch(Exception e){
+			task.error(e);
+		}
+	}
+	
+	public static void fetch(final ForgeTask task, @ForgeParam("tags") JSONArray tags){
+		initDB();
+		try{
+			
 		}catch(Exception e){
 			task.error(e);
 		}
