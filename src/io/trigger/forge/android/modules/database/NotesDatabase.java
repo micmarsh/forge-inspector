@@ -288,6 +288,84 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	
+	
+	private String buildFetchQuery(JSONArray tags,boolean noteByTag) throws JSONException{
+		StringBuilder query = new StringBuilder("");
+		int length = tags.length();
+		for(int i = 0; i < length; i++){
+			String s = tags.getString(i);
+			if(!query.toString().equals(""))
+				query.append(noteByTag?" intersect ":" union ");
+			query.append("select distinct "+
+				(noteByTag?LOC_COL:TAG_COL)
+				+" from "+TABLE_NAMES[TAGS]
+					+" where "+
+				(noteByTag?TAG_COL:LOC_COL)
+				+"="+'\''+s+'\'');//switch the two "COL"'s!
+		}
+		Log.e("NotesDatabase query getSetBySet",query.toString());
+		return query.toString();
+	}
+	
+	private String[] getSetBySet(JSONArray set,boolean noteByTag) throws JSONException{
+		
+		Cursor c = db.rawQuery(buildFetchQuery(set,noteByTag),null);//this would need to be changed (see above)
+		
+		String[] toRet = new String[c.getCount()];
+		
+		int col = c.getColumnIndex(noteByTag?LOC_COL:TAG_COL);//this need to be TAG_COL
+		
+		int i = 0;
+		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
+			toRet[i] = c.getString(col);
+			i++;
+		}
+		
+		c.close();
+		return toRet;
+	}
+	
+	private synchronized String[] getIDs(JSONArray tags) throws JSONException{
+		return getSetBySet(tags,true);
+	}
+	
+public synchronized JSONObject getNote(String id) throws JSONException{
+		
+		String loc_id = id.length() > 20?getID(id,true):id;//translates id to local if not already
+		
+		if(loc_id == null) return null;
+		
+		if(!db.isOpen())open();
+	
+		String query = SELECT_ALL+TABLE_NAMES[MAIN]+" where "+LOC_COL+"="+loc_id;
+		
+		Cursor c = db.rawQuery(query, null);
+		
+		JSONObject toRet = extractNotesFromCursor(c).getJSONObject(0);//?????
+
+		c.close();
+		if(db.isOpen())close();
+
+		return toRet;
+		
+	}
+	 
+	public synchronized JSONArray fetch(JSONArray tags) throws JSONException {
+		
+		open();
+		
+		String[] ids = getIDs(tags);
+		
+		JSONArray toRet = new JSONArray();
+		
+		for(String id:ids){Log.e("omg note id",id);toRet.put(getNote(id));}
+			
+		close();
+		
+		return toRet;
+	}
+	
+	
 /*	public synchronized Note addNewNote(String text,String server_id,String timestamp  ){
 		if(!db.isOpen() )open();
 		
@@ -326,44 +404,7 @@ public class NotesDatabase extends FetchDB{
 		return toRet;
 	}
 	
-	
-	private String buildFetchQuery(ArrayList<String> tags,boolean noteByTag){
-		StringBuilder query = new StringBuilder("");
-		for(String s : tags){
-			if(!query.toString().equals(""))
-				query.append(noteByTag?" intersect ":" union ");
-			query.append("select distinct "+
-				(noteByTag?LOC_COL:TAG_COL)
-				+" from "+TABLE_NAMES[TAGS]
-					+" where "+
-				(noteByTag?TAG_COL:LOC_COL)
-				+"="+'\''+s+'\'');//switch the two "COL"'s!
-		}
-		Log.e("NotesDatabase query getSetBySet",query.toString());
-		return query.toString();
-	}
-	
-	private String[] getSetBySet(ArrayList<String> set,boolean noteByTag){
-		
-		Cursor c = db.rawQuery(buildFetchQuery(set,noteByTag),null);//this would need to be changed (see above)
-		
-		String[] toRet = new String[c.getCount()];
-		
-		int col = c.getColumnIndex(noteByTag?LOC_COL:TAG_COL);//this need to be TAG_COL
-		
-		int i = 0;
-		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
-			toRet[i] = c.getString(col);
-			i++;
-		}
-		
-		c.close();
-		return toRet;
-	}
-	
-	private synchronized String[] getIDs(ArrayList<String> tags){
-		return getSetBySet(tags,true);
-	}
+
 	
 	private String[] getTagsByIDs(ArrayList<String> ids){
 		return getSetBySet(ids,false);
@@ -393,27 +434,6 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	
-	
-	 
-	public synchronized Note[] fetch(ArrayList<String> tags) {
-		
-		open();
-		
-		String[] ids = getIDs(tags);
-		
-		Note[] toRet = new Note[ids.length];
-		
-		
-		{int i = 0;for(String id:ids){Log.e("omg note id",id); toRet[i] = getNote(id); i++;}}
-			
-		close();
-		
-		
-		CommonFunctions.sortNotes(toRet); 
-			
-		return toRet;
-		
-	}
 	
 	//ArrayList<Note> leftOver = new ArrayList<Note>();
 	
@@ -455,26 +475,7 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	 
-	public synchronized Note getNote(String id){
-		
-		String loc_id = id.length() > 20?getLocID(id):id;
-		
-		if(loc_id == null) return null;
-		
-		if(!db.isOpen())open();
 	
-		String query = SELECT_ALL+TABLE_NAMES[MAIN]+" where "+LOC_COL+"="+loc_id;
-		
-		Cursor c = db.rawQuery(query, null);
-		
-		Note toRet = extractNotesFromCursor(c)[0];//?????
-
-		c.close();
-		if(db.isOpen())close();
-
-		return toRet;
-		
-	}
 	
 
 	 

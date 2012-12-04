@@ -89,7 +89,6 @@ public class API {
 	public static void fetch(final ForgeTask task, @ForgeParam("tags") JSONArray tags){
 		initDB();
 		try{
-			
 		}catch(Exception e){
 			task.error(e);
 		}
