@@ -159,7 +159,7 @@ public class NotesDatabase extends FetchDB{
 	private void addEntities(JSONArray array,String noteID, int type) throws JSONException{
 		int length = array.length();
 		for(int i = 0; i < length; i++){
-			setEntityVal(noteID,array.getString(i),type);
+			setEntityVal(noteID,array.getString(i).toLowerCase(),type);
 			db.insert(TABLE_NAMES[type], null, values);
 		}
 	}
