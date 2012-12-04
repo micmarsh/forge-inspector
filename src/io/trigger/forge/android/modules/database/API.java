@@ -26,7 +26,7 @@ public class API {
 	public static void put(final ForgeTask task, @ForgeParam("models") final JSONArray models,
 			@ForgeParam("entities") final JSONArray entities){
 		initDB();
-		JSONArray results = new JSONArray();
+		JSONArray results = new JSONArray();//populated inside addWithoutInit in the least FP style
 		try{
 			int mLength = models.length(),
 				eLength = entities.length();
@@ -42,7 +42,7 @@ public class API {
 		}
 	}
 	
-	public static void put(final ForgeTask task, @ForgeParam("model") final JSONObject model,
+	/*public static void put(final ForgeTask task, @ForgeParam("model") final JSONObject model,
 			@ForgeParam("entities") final JSONObject entities){
 		initDB();
 		try{
@@ -55,7 +55,8 @@ public class API {
 	private static void addWithoutInit(final ForgeTask task, @ForgeParam("model") final JSONObject model,
 			@ForgeParam("entities") final JSONObject entities) throws JSONException{
 		addWithoutInit(task, model, entities, null);
-	}
+	}*/
+	
 	private static void addWithoutInit(final ForgeTask task, @ForgeParam("model") final JSONObject model,
 			@ForgeParam("entities") final JSONObject entities,final JSONArray results) throws JSONException{
 		System.out.println("**********yay model!!!!!!!!!!!!!! "+model.toString());
