@@ -14,9 +14,9 @@ public class NotesDatabase extends FetchDB{
 
 	static final String[] TABLE_NAMES = new String[]{"Notes","NoteTag","NoteContacts","NoteEmail","NoteURL"};
 	static final int MAIN = 0,
-	 TAGS = 1,
-	 CONTACTS = 2,
-	 EMAILS = 3,
+	TAGS = 1,
+	CONTACTS = 2,
+	EMAILS = 3,
 	URLS = 4;
 
 
@@ -131,6 +131,43 @@ public class NotesDatabase extends FetchDB{
 				model.getString("sync"));
  	}
 
+ 	public synchronized JSONArray queryToTags(String query){
+		return queryToEntities(query,"tag");
+	}
+
+	public synchronized JSONArray queryToEntities(String query, String type){//"tag" "contact" "email" or "url"
+		open();
+		Cursor c = db.rawQuery(query, null);
+		JSONArray entities = new JSONArray();
+
+		int col = c.getColumnIndex(type);
+
+		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
+			entities.put(c.getString(col));
+		}
+
+		c.close();
+		close();
+		return entities;
+	}
+
+	//Takes a string, returns a JSONArray of JSONObjects
+	public synchronized JSONArray queryToNotes(String query) throws JSONException{
+		open();
+		Cursor c = db.rawQuery(query, null);//the actual querying happens
+		JSONArray notes = extractNotesFromCursor(c);
+		c.close();
+		close();
+		return notes;
+	}
+
+	public synchronized JSONArray writeQuery(String query, String method){
+		JSONArray toRet = new JSONArray();
+		db.rawQuery(query, null);
+		toRet.put(db.rawQuery("SELECT last_insert_rowid()", null));
+		return toRet;
+	}
+ 	
 	public synchronized String addNewNote(JSONObject model, JSONObject entities) throws JSONException{
 		if( !db.isOpen() )open();
 		extractAndSetNoteVals(model);
@@ -197,16 +234,7 @@ public class NotesDatabase extends FetchDB{
 		return toRet;
 	}
 
-	//Takes a string, returns a JSONArray of JSONObjects
-	public synchronized JSONArray queryToNotes(String query) throws JSONException{
-		open();
-		Cursor c = db.rawQuery(query, null);//the actual querying happens
-		JSONArray notes = extractNotesFromCursor(c);
-		c.close();
-		close();
-		return notes;
-	}
-
+	
 	//Takes a Cursor (the "raw" result of query in android) and converts it the a JSONArray of JSONObjects
 	private JSONArray extractNotesFromCursor(Cursor c) throws JSONException{
 		JSONArray toRet = new JSONArray();
@@ -264,25 +292,27 @@ public class NotesDatabase extends FetchDB{
 
 	private JSONArray getEntities(int type){
 		if(!db.isOpen())open();
-		Cursor c = db.rawQuery(SELECT_DISTINCT[type],null);//SELECT_DISTINCT[type], null);
-
-		JSONArray toRet = new JSONArray();
+		Cursor c = db.rawQuery(SELECT_DISTINCT[type],null);
+		JSONArray entities = new JSONArray();
 
 		int col = c.getColumnIndex(entityStrings[type]);
 
 		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
-			toRet.put(c.getString(col));
+			entities.put(c.getString(col));
 		}
 
 		c.close();
-		if(db.isOpen())close();
-		return toRet;
+		close();
+		return entities;
+
+
 	}
 
 
 	public synchronized JSONArray getTags() {
 		return getEntities(TAGS);
 	}
+
 
 
 
