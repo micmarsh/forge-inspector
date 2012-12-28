@@ -164,8 +164,15 @@ public class NotesDatabase extends FetchDB{
 	public synchronized JSONArray writeQuery(String query, String method){
 		open();
 		JSONArray toRet = new JSONArray();
-		db.rawQuery(query, null);
-		toRet.put(db.rawQuery("SELECT last_insert_rowid()", null));
+		db.execSQL(query);
+	
+		String column= "last_insert_rowid()";
+		Cursor c = db.rawQuery("SELECT "+column+" from Notes ",null);
+		c.moveToFirst();
+		//for(String columnName:c.getColumnNames())
+		System.out.println("woot woot woot: \n"+c.getInt(c.getColumnIndex(column)));
+		toRet.put("woot");
+		
 		close();
 		return toRet;
 	}
