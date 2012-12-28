@@ -162,9 +162,11 @@ public class NotesDatabase extends FetchDB{
 	}
 
 	public synchronized JSONArray writeQuery(String query, String method){
+		open();
 		JSONArray toRet = new JSONArray();
 		db.rawQuery(query, null);
 		toRet.put(db.rawQuery("SELECT last_insert_rowid()", null));
+		close();
 		return toRet;
 	}
  	
