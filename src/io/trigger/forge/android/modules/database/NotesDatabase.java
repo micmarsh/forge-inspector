@@ -135,7 +135,7 @@ public class NotesDatabase extends FetchDB{
 		return queryToEntities(query,"tag");
 	}
 
-	public synchronized JSONArray queryToEntities(String query, String type){//"tag" "contact" "email" or "url"
+	public synchronized JSONArray queryToEntities(String query, String type){//type: "tag" "contact" "email" or "url"
 		open();
 		Cursor c = db.rawQuery(query, null);
 		JSONArray entities = new JSONArray();
@@ -161,20 +161,12 @@ public class NotesDatabase extends FetchDB{
 		return notes;
 	}
 
-	public synchronized JSONArray writeQuery(String query, String method){
-		open();
-		JSONArray toRet = new JSONArray();
+	public synchronized int writeQuery(String query){
 		db.execSQL(query);
-	
 		String column= "last_insert_rowid()";
 		Cursor c = db.rawQuery("SELECT "+column+" from Notes ",null);
 		c.moveToFirst();
-		//for(String columnName:c.getColumnNames())
-		System.out.println("woot woot woot: \n"+c.getInt(c.getColumnIndex(column)));
-		toRet.put("woot");
-		
-		close();
-		return toRet;
+		return c.getInt(c.getColumnIndex(column));
 	}
  	
 	public synchronized String addNewNote(JSONObject model, JSONObject entities) throws JSONException{

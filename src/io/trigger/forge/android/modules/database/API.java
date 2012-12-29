@@ -135,17 +135,32 @@ public class API {
 	}
 
 	
-	public static void write(final ForgeTask task, @ForgeParam("query") String query,
-			@ForgeParam("method") String method){//may not even need method
+	public static void write(final ForgeTask task, @ForgeParam("query") String query){
 		initDB();
 		try{
-			task.success(notesDB.writeQuery(query, method));
+			task.success(notesDB.writeQuery(query));
 		}catch(Exception e){
 			e.printStackTrace();
 			task.error(e);
 		}
 		
 	}
+	
+	public static void writeAll(final ForgeTask task, @ForgeParam("queries") JSONArray queries){
+		initDB();
+		try{
+			notesDB.open();
+			JSONArray toRet = new JSONArray();
+			for(int i = 0; i < queries.length(); i++)
+				toRet.put(notesDB.writeQuery(queries.getString(i)));
+			notesDB.close();
+			task.success(toRet);
+		}catch(Exception e){
+			notesDB.close();
+			task.error(e);
+		}
+	}
+		
 	public static void wipe(final ForgeTask task){
 		initDB();
 		try{
