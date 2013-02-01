@@ -76,7 +76,7 @@ public class API {
 			JSONArray toRet = new JSONArray();
 			for(int i = 0; i < queries.length(); i++){
 				JSONObject query = queries.getJSONObject(i);
-				toRet.put(notesDB.writeQuery(query.getString("query"), query.getString("text")));
+				toRet.put(notesDB.writeQuery(query.getString("query"), query.getJSONArray("args")));
 			}
 			notesDB.close();
 			task.success(toRet);

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -144,10 +145,17 @@ public class NotesDatabase extends FetchDB{
 		close();
 		return notes;
 	}
+	
+	private String[] toArray(JSONArray strings) throws JSONException{
+		String[] results = new String[strings.length()];
+		for(int i = 0; i < results.length; i++) results[i] = strings.getString(i);
+		return results;
+	}
 
-	public synchronized int writeQuery(String query, String arg){
-		db.execSQL(query,new String[]{arg});
+	public synchronized int writeQuery(String query, JSONArray args) throws SQLException, JSONException{
+		db.execSQL(query,toArray(args));
 		String column= "last_insert_rowid()";
+		//this needs to be actually grab id:
 		Cursor c = db.rawQuery("SELECT "+column+" from "+TABLE_NAMES[0], null);
 		c.moveToFirst();
 		return c.getInt(c.getColumnIndex(column));
