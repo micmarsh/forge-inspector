@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class NotesDatabase extends FetchDB{
 
-	static final String[] TABLE_NAMES = new String[]{"Notes","NoteTag","NoteContacts","NoteEmail","NoteURL"};
+	//static final String[] TABLE_NAMES = new String[]{"Notes","NoteTag","NoteContacts","NoteEmail","NoteURL"};
 	static final int MAIN = 0,
 	TAGS = 1,
 	CONTACTS = 2,
@@ -56,8 +56,22 @@ public class NotesDatabase extends FetchDB{
 
 	//In all likelihood, none of this^ shit is needed
 	
+	private static String[] CREATE_TABLE_QUERIES = null;
+	private static String[] TABLE_NAMES = null;
+	
+	public static void setQueries(JSONArray schema) throws JSONException{
+		int length = schema.length();
+		TABLE_NAMES = new String[length];
+		CREATE_TABLE_QUERIES = new String[length];
+		for(int i = 0; i < length; i++){
+			JSONObject info = schema.getJSONObject(i);
+			TABLE_NAMES[i] = info.getString("name");
+			CREATE_TABLE_QUERIES[i] = "CREATE "+info.getString("name")+" "+info.getString("schema");
+		}
+	}
+	
 	public NotesDatabase(Context context) {
-		super(context,TABLE_NAMES[MAIN]);
+		super(context,"Main");
 		Log.e("woot woot","called constructor!");
 		open();//won't be created until we do this!
 		close();
@@ -70,12 +84,7 @@ public class NotesDatabase extends FetchDB{
 
 	private void create_tables(SQLiteDatabase db){
 		Log.e("create tables","create tables called");
-		int i = 0;
-		for(String name : TABLE_NAMES){
-			db.execSQL(CREATE + name + ' '+SCHEMA[i]+';');
-			i++;
-		}
-
+		for(String name : CREATE_TABLE_QUERIES) db.execSQL(name+';');
 		this.db = db;
 	}
 
@@ -98,19 +107,21 @@ public class NotesDatabase extends FetchDB{
 	}
 
 
- 	public synchronized JSONArray queryToTags(String query){
+ 	public synchronized JSONArray queryToTags(String query) throws JSONException{
 		return queryToEntities(query,"tag");
 	}
 
-	public synchronized JSONArray queryToEntities(String query, String type){
+	public synchronized JSONArray queryToEntities(String query, String type) throws JSONException{
 		open();
 		Cursor c = db.rawQuery(query, null);
 		JSONArray entities = new JSONArray();
 
 		int col = c.getColumnIndex(type);
+		int countCol = c.getColumnIndex("CountWoot");
 
 		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
-			entities.put(c.getString(col));
+			entities.put(new JSONObject().put("text", c.getString(col))
+					.put("count", c.getInt(countCol)));
 		}
 
 		c.close();
@@ -146,7 +157,6 @@ public class NotesDatabase extends FetchDB{
 		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){//Extract note from cursor
 			toRet.put(new JSONObject()
 						.put("text",c.getString(cIndices[TEXT]))
-						.put("html",c.getString(cIndices[HTML]))
 						.put("localID",c.getString(cIndices[LOCAL_ID]))
 						.put("lastModified",c.getString(cIndices[TIMESTAMP]))
 						.put("id", c.getString(cIndices[SERVER_ID]))

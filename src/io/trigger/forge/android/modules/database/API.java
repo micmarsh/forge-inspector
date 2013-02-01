@@ -23,6 +23,14 @@ public class API {
 		}
 	}
 
+	public static void createTables(final ForgeTask task, @ForgeParam("schema") JSONArray schema){
+		try{
+			NotesDatabase.setQueries(schema);
+			task.success();
+		}catch(Exception e){
+			task.error(e);
+		}
+	}
 
 	public static void entityQuery(final ForgeTask task, @ForgeParam("query") String query
 		,@ForgeParam("type") final String type){
