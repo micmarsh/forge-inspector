@@ -8,6 +8,41 @@
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
 	alert("hello, world!");
+	/*toCall: function, args, success, error*/
+	var callAsync = function (toCalls) {
+		if(toCalls.length){
+			toCall = toCalls[0];
+			forge.internal.call('database.'+toCall.string,
+			toCall.args,
+			function(success){
+				toCall.success(success);
+				callAsync(toCalls.slice(1));
+			},toCall.error)
+		}
+	}
+	
+	callAsync([
+		{
+			string: 'createTables',
+			args: {schema:[{name:"Poo", schema: "(identification INTEGER PRIMARY KEY, poop TEXT)"}]},
+			success: function(){alert("Yay created tables");}
+		},
+		/*{
+			string: 'writeAll',
+			args: {queries:[{name:"Poo", schema: "(identification INTEGER PRIMARY KEY, poop TEXT)"}]},
+			success: function(){alert("Yay created tables");}
+		},*/
+		{
+			string: 'wipe',
+			args:{},
+			success: function(){alert("yay dropped tables");},
+			error: function(e){
+				alert("Shit an error");
+				console.log(e);
+			}
+		}
+	]
+	)
 
 		</script>
 	</head>

@@ -84,6 +84,7 @@ public class API {
 		initDB();
 		try{
 			notesDB.reset();
+			task.success();
 		}catch(Exception e){
 			task.error(e);
 		}

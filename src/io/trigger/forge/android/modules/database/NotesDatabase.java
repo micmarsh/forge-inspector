@@ -66,7 +66,7 @@ public class NotesDatabase extends FetchDB{
 		for(int i = 0; i < length; i++){
 			JSONObject info = schema.getJSONObject(i);
 			TABLE_NAMES[i] = info.getString("name");
-			CREATE_TABLE_QUERIES[i] = "CREATE "+info.getString("name")+" "+info.getString("schema");
+			CREATE_TABLE_QUERIES[i] = "CREATE TABLE "+info.getString("name")+" "+info.getString("schema");
 		}
 	}
 	
