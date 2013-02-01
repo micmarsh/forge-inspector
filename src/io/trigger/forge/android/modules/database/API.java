@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import io.trigger.forge.android.core.ForgeApp;
@@ -26,8 +27,11 @@ public class API {
 	public static void createTables(final ForgeTask task, @ForgeParam("schema") JSONArray schema){
 		try{
 			NotesDatabase.setQueries(schema);
+			//Can't create new tables without onUpgrade yet, as it probably should be
+			initDB();
 			task.success();
 		}catch(Exception e){
+			e.printStackTrace();
 			task.error(e);
 		}
 	}

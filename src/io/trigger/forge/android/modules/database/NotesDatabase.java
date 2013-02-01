@@ -82,6 +82,11 @@ public class NotesDatabase extends FetchDB{
 	public void onCreate(SQLiteDatabase db) {
 		create_tables(db);
 	}
+	
+	public void createTables(){
+		Log.e("create tables","non-fresh create tables called");
+		for(String name : CREATE_TABLE_QUERIES) db.execSQL(name+';');
+	}
 
 	private void create_tables(SQLiteDatabase db){
 		Log.e("create tables","create tables called");
