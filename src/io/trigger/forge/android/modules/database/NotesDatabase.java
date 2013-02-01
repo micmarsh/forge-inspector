@@ -67,6 +67,7 @@ public class NotesDatabase extends FetchDB{
 			JSONObject info = schema.getJSONObject(i);
 			TABLE_NAMES[i] = info.getString("name");
 			CREATE_TABLE_QUERIES[i] = "CREATE TABLE "+info.getString("name")+" "+info.getString("schema");
+			Log.e("tables init'ed", CREATE_TABLE_QUERIES[i]);
 		}
 	}
 	
@@ -139,10 +140,10 @@ public class NotesDatabase extends FetchDB{
 		return notes;
 	}
 
-	public synchronized int writeQuery(String query){
-		db.execSQL(query);
+	public synchronized int writeQuery(String query, String arg){
+		db.execSQL(query,new String[]{arg});
 		String column= "last_insert_rowid()";
-		Cursor c = db.rawQuery("SELECT "+column+" from Notes ",null);
+		Cursor c = db.rawQuery("SELECT "+column+" from "+TABLE_NAMES[0], null);
 		c.moveToFirst();
 		return c.getInt(c.getColumnIndex(column));
 	}

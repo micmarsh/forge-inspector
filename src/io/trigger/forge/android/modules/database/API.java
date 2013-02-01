@@ -70,8 +70,10 @@ public class API {
 		try{
 			notesDB.open();
 			JSONArray toRet = new JSONArray();
-			for(int i = 0; i < queries.length(); i++)
-				toRet.put(notesDB.writeQuery(queries.getString(i)));
+			for(int i = 0; i < queries.length(); i++){
+				JSONObject query = queries.getJSONObject(i);
+				toRet.put(notesDB.writeQuery(query.getString("query"), query.getString("text")));
+			}
 			notesDB.close();
 			task.success(toRet);
 		}catch(Exception e){

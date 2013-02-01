@@ -24,14 +24,20 @@
 	callAsync([
 		{
 			string: 'createTables',
-			args: {schema:[{name:"Poo", schema: "(identification INTEGER PRIMARY KEY, poop TEXT)"}]},
+			args: {schema:[
+					{name:"Poo", schema: "(identification INTEGER PRIMARY KEY, poop TEXT)"},
+					{name: "Woot", schema: "(wootLevel INTEGER, wootName TEXT, age TEXT)"}
+				]},
 			success: function(){alert("Yay created tables");}
 		},
-		/*{
+		{
 			string: 'writeAll',
-			args: {queries:[{name:"Poo", schema: "(identification INTEGER PRIMARY KEY, poop TEXT)"}]},
-			success: function(){alert("Yay created tables");}
-		},*/
+			args: {queries:[
+					{query:"insert into Poo (poop) values (?)", text:"wooot woo"},
+					{query:"insert into Woot (wootLevel, wootName, age) values (69, ?, 'old')", text: "wooty"}
+				]},
+			success: function(ids){alert(ids);}
+		},
 		{
 			string: 'wipe',
 			args:{},
