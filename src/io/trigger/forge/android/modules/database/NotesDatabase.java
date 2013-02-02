@@ -136,11 +136,12 @@ public class NotesDatabase extends FetchDB{
 		return entities;
 	}
 
+	
 	//Takes a string, returns a JSONArray of JSONObjects
 	public synchronized JSONArray queryToNotes(String query) throws JSONException{
 		open();
 		Cursor c = db.rawQuery(query, null);//the actual querying happens
-		JSONArray notes = extractNotesFromCursor(c);
+		JSONArray notes = cursorToArray(c);//extractNotesFromCursor(c);
 		c.close();
 		close();
 		return notes;
@@ -159,6 +160,38 @@ public class NotesDatabase extends FetchDB{
 		Cursor c = db.rawQuery("SELECT "+column+" from "+TABLE_NAMES[0], null);
 		c.moveToFirst();
 		return c.getInt(c.getColumnIndex(column));
+	}
+	
+	private Object get(Cursor c, int index) {
+		switch(c.getType(index)){
+			case Cursor.FIELD_TYPE_BLOB:
+				return c.getBlob(index);
+			case Cursor.FIELD_TYPE_FLOAT:
+				return c.getFloat(index);
+			case Cursor.FIELD_TYPE_INTEGER:
+				return c.getInt(index);
+			case Cursor.FIELD_TYPE_STRING:
+				return c.getString(index);
+			case Cursor.FIELD_TYPE_NULL:
+			default:
+				return null;
+		}
+	}
+	
+	private JSONArray cursorToArray(Cursor c) throws JSONException{
+		String[] columnNames = c.getColumnNames();
+		JSONArray results = new JSONArray();
+		
+		for (c.moveToFirst();!c.isAfterLast();c.moveToNext()){
+			JSONObject object = new JSONObject();
+			for(String name : columnNames){
+				int index = c.getColumnIndex(name);
+				object.put(name, get(c, index));
+			}
+			results.put(object);
+		}
+		
+		return results;
 	}
  	
 	//Takes a Cursor (the "raw" result of query in android) and converts it the a JSONArray of JSONObjects

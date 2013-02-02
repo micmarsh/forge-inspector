@@ -9,10 +9,10 @@
 		<script>
 	alert("hello, world!");
 	/*toCall: function, args, success, error*/
-	var callAsync = function (toCalls) {
+	function callAsync (toCalls) {
 		if(toCalls.length){
 			toCall = toCalls[0];
-			forge.internal.call('database.'+toCall.string,
+			forge.internal.call('database.'+toCall.method,
 			toCall.args,
 			function(success){
 				toCall.success(success);
@@ -23,15 +23,18 @@
 	
 	callAsync([
 		{
-			string: 'createTables',
+			method: 'createTables',
 			args: {schema:[
 					{name:"Poo", schema: "(identification INTEGER PRIMARY KEY, poop TEXT)"},
-					{name: "Woot", schema: "(wootLevel INTEGER, wootName TEXT, age TEXT)"}
+					{name: "Woot", schema: "(wootLevel INTEGER, wootName TEXT, age TEXT)"},
+					{name: "Notes", schema: "(text TEXT, local_id INTEGER PRIMARY KEY, server_id TEXT, timestamp TEXT)"},
+					{name: "NoteContacts", schema: "(attags TEXT, local_id INTEGER)"},
+					{name: "NoteTags", schema: "(attags TEXT, local_id INTEGER)"}
 				]},
 			success: function(){alert("Yay created tables");}
 		},
 		{
-			string: 'writeAll',
+			method: 'writeAll',
 			args: {queries:[
 					{query:"insert into Poo (poop) values (?)", args:["wooot woo"]},
 					{query:"insert into Woot (wootLevel, wootName, age) values (69, ?, 'old')", args: ["wooty"]}
@@ -39,7 +42,25 @@
 			success: function(ids){alert(ids);}
 		},
 		{
-			string: 'wipe',
+			method: 'query',
+			args: { query: "select * from Notes where  local_id in (select distinct local_id from NoteContacts where attags == '@brandly' intersect select distinct local_id from NoteContacts where attags == '@horak') and  text like '%poop%' collate nocase  order by timestamp desc  limit 4,7;" },
+			success: function(){alert("yay no exceptions")},
+			error: function(e){alert("shit an error"); console.log(e);}
+		},
+		{
+			method: 'query',
+			args: { query: "select * from Woot" },
+			success: function(stuff){alert(JSON.stringify(stuff));},
+			error: function(e){alert("shit an error"); console.log(e);}
+		},
+		{
+			method: 'query',
+			args: { query: "select * from Poo" },
+			success: function(stuff){alert(JSON.stringify(stuff));},
+			error: function(e){alert("shit an error"); console.log(e);}
+		},
+		{
+			method: 'wipe',
 			args:{},
 			success: function(){alert("yay dropped tables");},
 			error: function(e){
