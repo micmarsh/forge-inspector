@@ -196,7 +196,7 @@ public class NotesDatabase extends FetchDB{
  	
 	//Takes a Cursor (the "raw" result of query in android) and converts it the a JSONArray of JSONObjects
 	private JSONArray extractNotesFromCursor(Cursor c) throws JSONException{
-		JSONArray toRet = new JSONArray();
+		JSONArray toRet = new JSONArray();	
 
 		int[] cIndices = new int[NOTE_COLS.length];
 		for(int i = 0; i < NOTE_COLS.length;i++)cIndices[i] = c.getColumnIndex(NOTE_COLS[i]);//Find the indices of each column in the curso
