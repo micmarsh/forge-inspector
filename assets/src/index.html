@@ -8,67 +8,8 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
-	alert("hello, world!");
 	/*toCall: function, args, success, error*/
-	function callAsync (toCalls) {
-		if(toCalls.length){
-			toCall = toCalls[0];
-			forge.internal.call('database.'+toCall.method,
-			toCall.args,
-			function(success){
-				toCall.success(success);
-				callAsync(toCalls.slice(1));
-			},toCall.error)
-		}
-	}
-	
-	callAsync([
-		{
-			method: 'createTables',
-			args: {schema:[
-					{name:"Poo", schema: "(identification INTEGER PRIMARY KEY, poop TEXT)"},
-					{name: "Woot", schema: "(wootLevel INTEGER, wootName TEXT, age TEXT)"},
-					{name: "Notes", schema: "(text TEXT, local_id INTEGER PRIMARY KEY, server_id TEXT, timestamp TEXT)"},
-					{name: "NoteContacts", schema: "(attags TEXT, local_id INTEGER)"},
-					{name: "NoteTags", schema: "(hashtags TEXT, local_id INTEGER)"}
-				]},
-			success: function(){alert("Yay created tables");}
-		},
-		{
-			method: 'writeAll',
-			args: {queries:[
-					{query:"insert into Poo (poop) values (?)", args:[  ]},
-					{query:"insert into Woot (wootLevel, wootName, age) values (69, ?, 'old')", args: ["wooty"]},
-					{query:"insert into NoteTags values ('#poop', 3)", args:[  ]},
-					{query:"insert into NoteTags values ('#poop', 3)", args:[  ]},
-					{query:"insert into NoteTags values ('#poop', 3)", args:[  ]},
-					{query:"insert into NoteTags values ('#woot', 3)", args:[  ]}
-				]},
-			success: function(ids){alert(ids);}
-		},
-		{
-			method: 'query',
-			args: { query: "select * from Woot" },
-			success: function(stuff){alert(JSON.stringify(stuff));},
-			error: function(e){alert("shit an error"); console.log(e);}
-		},
-		{
-			method: 'query',
-			args: { query: "select hashtags as name, count(hashtags) as count from NoteTags group by hashtags" },
-			success: function(stuff){alert(JSON.stringify(stuff));},
-			error: function(e){alert("shit an error"); console.log(e);}
-		},
-		{
-			method: 'wipe',
-			args:{},
-			success: function(){alert("yay dropped tables");},
-			error: function(e){
-				alert("Shit an error");
-				console.log(e);
-			}
-		}
-	]
-	)
+
 
 		</script>
 	</head>
