@@ -8,8 +8,22 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
-	/*toCall: function, args, success, error*/
-
+		Fetch.db.callAsync([
+			{
+				method: 'notes.create',
+				model: new Backbone.Model({text: 'foo hundred #bars', entities:{hashtags:["#bars"]}}),
+				options:{
+					dirty: true,
+					success: function(poo){
+						console.log(poo);
+					}
+				}
+			}/*,
+			{
+			},
+			{
+			}*/
+		])
 
 		</script>
 	</head>
