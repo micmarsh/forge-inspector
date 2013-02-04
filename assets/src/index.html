@@ -4,6 +4,7 @@
 		<script src="../forge/all.js"></script>
 		<script src="js/jquery-1.7.2.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
+		<script src="js/fetchnotes.js"></script>
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
@@ -29,23 +30,21 @@
 					{name: "Woot", schema: "(wootLevel INTEGER, wootName TEXT, age TEXT)"},
 					{name: "Notes", schema: "(text TEXT, local_id INTEGER PRIMARY KEY, server_id TEXT, timestamp TEXT)"},
 					{name: "NoteContacts", schema: "(attags TEXT, local_id INTEGER)"},
-					{name: "NoteTags", schema: "(attags TEXT, local_id INTEGER)"}
+					{name: "NoteTags", schema: "(hashtags TEXT, local_id INTEGER)"}
 				]},
 			success: function(){alert("Yay created tables");}
 		},
 		{
 			method: 'writeAll',
 			args: {queries:[
-					{query:"insert into Poo (poop) values (?)", args:["wooot woo"]},
-					{query:"insert into Woot (wootLevel, wootName, age) values (69, ?, 'old')", args: ["wooty"]}
+					{query:"insert into Poo (poop) values (?)", args:[  ]},
+					{query:"insert into Woot (wootLevel, wootName, age) values (69, ?, 'old')", args: ["wooty"]},
+					{query:"insert into NoteTags values ('#poop', 3)", args:[  ]},
+					{query:"insert into NoteTags values ('#poop', 3)", args:[  ]},
+					{query:"insert into NoteTags values ('#poop', 3)", args:[  ]},
+					{query:"insert into NoteTags values ('#woot', 3)", args:[  ]}
 				]},
 			success: function(ids){alert(ids);}
-		},
-		{
-			method: 'query',
-			args: { query: "select * from Notes where  local_id in (select distinct local_id from NoteContacts where attags == '@brandly' intersect select distinct local_id from NoteContacts where attags == '@horak') and  text like '%poop%' collate nocase  order by timestamp desc  limit 4,7;" },
-			success: function(){alert("yay no exceptions")},
-			error: function(e){alert("shit an error"); console.log(e);}
 		},
 		{
 			method: 'query',
@@ -55,7 +54,7 @@
 		},
 		{
 			method: 'query',
-			args: { query: "select * from Poo" },
+			args: { query: "select hashtags as name, count(hashtags) as count from NoteTags group by hashtags" },
 			success: function(stuff){alert(JSON.stringify(stuff));},
 			error: function(e){alert("shit an error"); console.log(e);}
 		},

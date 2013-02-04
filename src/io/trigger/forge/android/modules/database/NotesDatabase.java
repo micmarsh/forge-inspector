@@ -179,7 +179,7 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	private JSONArray cursorToArray(Cursor c) throws JSONException{
-		String[] columnNames = c.getColumnNames();
+		final String[] columnNames = c.getColumnNames();
 		JSONArray results = new JSONArray();
 		
 		for (c.moveToFirst();!c.isAfterLast();c.moveToNext()){
