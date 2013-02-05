@@ -10,23 +10,51 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
-		var db = new Database();
-		db.callAsync([
-			{
-				method: 'notes.create',
-				model: new Kinvey.Entity({text: 'foo hundred #bars', entities:{hashtags:["#bars"]}},'notes'),
-				options:{
-					dirty: true,
-					success: function(poo){
-						console.log(poo);
+		
+		forge.internal.call("database.createTables",{schema: window.tables},
+		function(){
+			var db = new Database();
+			db.callAsync([
+				{
+					method: 'notes.create',
+					model: new Kinvey.Entity({
+						text: 'eighteen hundred #bars of #gold',
+						entities:{hashtags:["#bars", "#gold"]},
+						id: "fosidfjoai"
+					},'notes'),
+					options:{
+						dirty: true,
+						success: function(poo){
+							console.log(poo);
+						}
 					}
+				},
+				{
+					method: 'notes.create',
+					model: new Kinvey.Entity({
+						text: '#todo: sit in my #gold plated chair',
+						entities:{hashtags:["#todo", "#gold"]},
+						id: "fdafjoai"
+					},'notes'),
+					options:{
+						dirty: true,
+						success: function(poo){
+							console.log(poo);
+						}
+					}
+				},
+				{
+					method: 'notes.get',
+					model: new Kinvey.Entity({
+						success: function(notes){
+							alert(JSON.stringify(notes));
+						}
+					},'notes')
 				}
-			}/*,
-			{
-			},
-			{
-			}*/
-		], db)
+			], db)
+		
+		});
+		
 
 		</script>
 	</head>

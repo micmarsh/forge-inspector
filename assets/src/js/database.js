@@ -20,7 +20,7 @@ Database = (function() {
   Database.prototype._whereClause = function(args) {
     var attags, clauses, dirty, hashtags, search;
     hashtags = args.hashtags, attags = args.attags, search = args.search, dirty = args.dirty;
-    clauses = _.compact([(hashtags.length || attags.length ? " local_id in (" + (Database.prototype._buildFilterQuery(hashtags, attags)) + ")" : ''), (search ? " text like '%" + search + "%' collate nocase " : ''), (dirty ? " sync_status != 'synced' " : '')]);
+    clauses = _.compact([(hashtags.length || attags.length ? " localID in (" + (Database.prototype._buildFilterQuery(hashtags, attags)) + ")" : ''), (search ? " text like '%" + search + "%' collate nocase " : ''), (dirty ? " sync_status != 'synced' " : '')]);
     if (clauses.length) {
       return "where " + clauses.join(' and ');
     } else {
@@ -44,7 +44,7 @@ Database = (function() {
         _results = [];
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
           item = _ref1[_j];
-          _results.push("select distinct local_id from " + this.TABLE_NAMES[name] + " where " + name + " == '" + item + "'");
+          _results.push("select distinct localID from " + this.TABLE_NAMES[name] + " where " + name + " == '" + item + "'");
         }
         return _results;
       }).call(this);
@@ -256,7 +256,7 @@ Database = (function() {
       var error, q, success, _i, _len;
       options || (options = {});
       success = options.success, error = options.error;
-      if (true) {
+      if (false) {
         console.log('##############################################\nwoot we debuggin\'');
         console.log(queries);
         for (_i = 0, _len = queries.length; _i < _len; _i++) {
@@ -301,7 +301,7 @@ Database = (function() {
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
           entity = _ref1[_j];
           results.push({
-            query: ("insert into " + this.TABLE_NAMES[entName] + " ") + ("(local_id, " + entName + ") values (" + id + ",\"" + (entity.toLowerCase()) + "\")"),
+            query: ("insert into " + this.TABLE_NAMES[entName] + " ") + ("(localID , " + entName + ") values (" + id + ",\"" + (entity.toLowerCase()) + "\")"),
             args: []
           });
         }
@@ -329,22 +329,22 @@ Database = (function() {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tableName = _ref[_i];
-        _results.push(makeObject("delete from " + tableName + " where local_id=" + id));
+        _results.push(makeObject("delete from " + tableName + " where localID=" + id));
       }
       return _results;
     },
     _buildAddNoteQuery: function(model) {
-      return "insert into Notes (text,server_id,last_updated,sync_status) " + (" values (?,\"" + (model.get('id')) + "\",") + ("\"" + (model.get('timestamp')) + "\",") + (" \"" + (model.get('sync')) + "\")");
+      return "insert into Notes (text,id,timestamp,sync) " + (" values (?,\"" + (model.get('id')) + "\",") + ("\"" + (model.get('timestamp')) + "\",") + (" \"" + (model.get('sync')) + "\")");
     },
     _checkNewness: function(model) {
       if (model.isNew()) {
-        return " local_id=\"" + (model.get('localID')) + "\"";
+        return " localID=\"" + (model.get('localID')) + "\"";
       } else {
-        return " server_id=\"" + model.id + "\"";
+        return " id=\"" + model.id + "\"";
       }
     },
     _buildUpdateNoteQuery: function(model, cleaning) {
-      return ("update Notes set text=?, server_id=\"" + (model.get('id')) + "\",") + ("last_updated=\"" + (model.get('lastModified')) + "\",") + ("sync_status=\"" + (model.get('sync')) + "\" where ") + (cleaning ? " local_id=\"" + (model.get('localID')) + "\"" : this._checkNewness(model));
+      return ("update Notes set text=?, id=\"" + (model.get('id')) + "\",") + ("timestamp=\"" + (model.get('timestamp')) + "\",") + ("sync=\"" + (model.get('sync')) + "\" where ") + (cleaning ? " localID=\"" + (model.get('localID')) + "\"" : this._checkNewness(model));
     },
     _buildDeleteNoteQuery: function(model) {
       console.log("apparently " + this._checkNewness + " doesn't exist");
@@ -364,7 +364,4 @@ Database = (function() {
   return Database;
 
 })();
-
-
-
 

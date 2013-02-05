@@ -48,3 +48,39 @@ Fetch.findEntities = function(text) {
 };
 
 
+window.tables = (function() {
+  var COLUMN, CREATE, ENTITY_COLS, LOC_COL, LOC_ID, SCHEMA, SERV_COL, STATUS_COL, TABLE_NAMES, TEXT_COL, TIME_COL, i, schema;
+  CREATE = "CREATE TABLE ";
+  TEXT_COL = "text";
+  LOC_COL = "localID";
+  SERV_COL = "id";
+  TIME_COL = "timestamp";
+  STATUS_COL = "sync";
+  TABLE_NAMES = ["Notes", "NoteTag", "NoteContact", "NoteURL", "NoteEmail"];
+  ENTITY_COLS = ["hashtags", "attags", "emails", "urls"];
+  LOC_ID = "" + LOC_COL + " INTEGER PRIMARY KEY ";
+  SCHEMA = [("(" + TEXT_COL + " TEXT, " + LOC_ID + ", " + SERV_COL + " TEXT UNIQUE,") + (" " + TIME_COL + " TEXT, " + STATUS_COL + " TEXT)")].concat((function() {
+    var _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = ENTITY_COLS.length; _i < _len; _i++) {
+      COLUMN = ENTITY_COLS[_i];
+      _results.push("(" + LOC_COL + " INTEGER, " + COLUMN + " TEXT)");
+    }
+    return _results;
+  })());
+  return (function() {
+    var _i, _len, _results;
+    _results = [];
+    for (i = _i = 0, _len = SCHEMA.length; _i < _len; i = ++_i) {
+      schema = SCHEMA[i];
+      _results.push({
+        name: TABLE_NAMES[i],
+        schema: schema
+      });
+    }
+    return _results;
+  })();
+})();
+
+
+
