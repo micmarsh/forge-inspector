@@ -15,12 +15,13 @@
 		function(){
 			var db = new Database();
 			db.callAsync([
-				{
-					method: 'notes.create',
+				/*{
+					method: 'notes.update',
 					model: new Kinvey.Entity({
-						text: 'eighteen hundred #bars of #gold',
-						entities:{hashtags:["#bars", "#gold"]},
-						id: "fosidfjoai"
+						text: 'eighteen hundred #bars of #gold. #email your mother',
+						entities:{hashtags:["#bars", "#gold", "email"]},
+						id: "fosidfjoai",
+						localID: 1
 					},'notes'),
 					options:{
 						dirty: true,
@@ -30,11 +31,12 @@
 					}
 				},
 				{
-					method: 'notes.create',
+					method: 'notes.update',
 					model: new Kinvey.Entity({
-						text: '#todo: sit in my #gold plated chair',
-						entities:{hashtags:["#todo", "#gold"]},
-						id: "fdafjoai"
+						text: '#todo: sit in my #gold plated chair foo #bars',
+						entities:{hashtags:["#todo", "#gold", "#bars"]},
+						id: "fdafjoai",
+						localID: 2
 					},'notes'),
 					options:{
 						dirty: true,
@@ -46,10 +48,13 @@
 				{
 					method: 'notes.get',
 					model: new Kinvey.Entity({
-						success: function(notes){
+						success: function (notes) {
 							alert(JSON.stringify(notes));
 						}
 					},'notes')
+				},*/
+				{
+					method: 'hashtags.get'
 				}
 			], db)
 		

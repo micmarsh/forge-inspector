@@ -12,7 +12,7 @@ Database = (function() {
 
   Database.prototype.TABLE_NAMES = {
     hashtags: "NoteTag",
-    attags: "NoteContacts",
+    attags: "NoteContact",
     emails: "NoteEmail",
     urls: "NoteURL"
   };
@@ -73,11 +73,12 @@ Database = (function() {
     }
 
     Entities.prototype._buildQuery = function(args) {
-      return ("select distinct " + args.type + " as name, count(" + args.type + ") as count") + (" from " + this.TABLE_NAMES[args.type] + " ") + Database.prototype._whereClause(args) + (" order by " + args.type + " desc");
+      return ("select distinct " + args.type + " as name, count(" + args.type + ") as count") + (" from " + this.TABLE_NAMES[args.type] + " ") + Database.prototype._whereClause(args) + (" group by " + args.type );
     };
 
     Entities.prototype.get = function(args) {
       var attags, hashtags, type;
+      args || (args = {});
       attags = args.attags, hashtags = args.hashtags, type = args.type;
       args = {
         attags: attags,
@@ -87,7 +88,10 @@ Database = (function() {
       args.hashtags || (args.hashtags = []);
       args.attags || (args.attags = []);
       args.type = this._type;
-      return this._buildQuery(args);
+      return forge.internal.call('database.query', {
+        query: this._buildQuery(args),
+        args: []
+      }, args.success, args.error);
     };
 
     return Entities;
@@ -256,7 +260,7 @@ Database = (function() {
       var error, q, success, _i, _len;
       options || (options = {});
       success = options.success, error = options.error;
-      if (false) {
+      if (true) {
         console.log('##############################################\nwoot we debuggin\'');
         console.log(queries);
         for (_i = 0, _len = queries.length; _i < _len; _i++) {
@@ -322,7 +326,7 @@ Database = (function() {
       makeObject = function(query) {
         return {
           query: query,
-          args: ['poop']
+          args: []
         };
       };
       _ref = _.values(this.TABLE_NAMES);
