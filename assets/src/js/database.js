@@ -73,11 +73,12 @@ Database = (function() {
     }
 
     Entities.prototype._buildQuery = function(args) {
-      return ("select distinct " + args.type + " as name, count(" + args.type + ") as count") + (" from " + this.TABLE_NAMES[args.type] + " ") + Database.prototype._whereClause(args) + (" group by " + args.type );
+      return ("select distinct " + args.type + " as name, count(" + args.type + ") as count") + (" from " + this.TABLE_NAMES[args.type] + " ") + Database.prototype._whereClause(args) + (" group by " + args.type);
     };
 
     Entities.prototype.get = function(args) {
       var attags, hashtags, type;
+      alert("sheeeeeeit: " + (JSON.stringify(args)));
       args || (args = {});
       attags = args.attags, hashtags = args.hashtags, type = args.type;
       args = {
@@ -88,6 +89,7 @@ Database = (function() {
       args.hashtags || (args.hashtags = []);
       args.attags || (args.attags = []);
       args.type = this._type;
+      alert("sheeeeeeit crazy-ass sanitation and shit: " + (JSON.stringify(args)));
       return forge.internal.call('database.query', {
         query: this._buildQuery(args),
         args: []
@@ -120,6 +122,7 @@ Database = (function() {
 
   Database.prototype.callAsync = function(calls, context) {
     var collection, currentCall, error, func, method, model, options, success, _ref;
+    alert(calls.length);
     if (calls.length) {
       currentCall = calls[0];
       method = currentCall.method, model = currentCall.model, options = currentCall.options;
@@ -137,7 +140,7 @@ Database = (function() {
         console.error("Error calling " + method + ", calling next method anyway");
         return context.callAsync(calls.slice(1), context);
       };
-      return this[collection][func](model, options);
+      return this[collection][func]((func === 'get' ? options : model), options);
     }
   };
 

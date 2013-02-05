@@ -36,21 +36,11 @@ public class API {
 		}
 	}
 
-	public static void entityQuery(final ForgeTask task, @ForgeParam("query") String query
-		,@ForgeParam("type") final String type){
-		initDB();
-		try{						//runs the query, returns a JSONArray of JSONObjects
-			task.success(notesDB.queryToEntities(query,type));
-		}catch(Exception e){
-			task.error(e);
-		}
-	}
-
 
 	public static void query(final ForgeTask task, @ForgeParam("query") String query){
 		initDB();
 		try{					
-			task.success(notesDB.queryToNotes(query));
+			task.success(notesDB.queryToObjects(query));
 		}catch(Exception e){
 			task.error(e);
 		}

@@ -29,11 +29,11 @@
 							console.log(poo);
 						}
 					}
-				},
+				},*/
 				{
 					method: 'notes.update',
 					model: new Kinvey.Entity({
-						text: '#todo: sit in my #gold plated chair foo #bars',
+						text: '#todo: sit in my #gold plated chair foo #bars\nOh yeah day bow bow',
 						entities:{hashtags:["#todo", "#gold", "#bars"]},
 						id: "fdafjoai",
 						localID: 2
@@ -52,9 +52,26 @@
 							alert(JSON.stringify(notes));
 						}
 					},'notes')
-				},*/
+				},
 				{
-					method: 'hashtags.get'
+					method: 'hashtags.get',
+					options:{
+						success: function(tags){
+							alert(JSON.stringify(tags));						
+						}
+					}
+					
+				},
+				//What the fuck figure out why no recur
+				{
+					method: 'hashtags.get',
+					options: {
+						hashtags:["#email"],
+						success: function(tags){
+							alert(JSON.stringify(tags));
+						}
+					}
+					
 				}
 			], db)
 		

@@ -138,7 +138,7 @@ public class NotesDatabase extends FetchDB{
 
 	
 	//Takes a string, returns a JSONArray of JSONObjects
-	public synchronized JSONArray queryToNotes(String query) throws JSONException{
+	public synchronized JSONArray queryToObjects(String query) throws JSONException{
 		open();
 		Cursor c = db.rawQuery(query, null);//the actual querying happens
 		JSONArray notes = cursorToArray(c);//extractNotesFromCursor(c);
