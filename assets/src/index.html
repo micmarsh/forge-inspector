@@ -10,18 +10,59 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
-		
+
 		forge.internal.call("database.createTables",{schema: window.tables},
 		function(){
 			var db = new Database();
+
+			var models = [
+				new Kinvey.Entity({
+					text: '#email your mother bout caves. and #gold',
+					entities:{hashtags:["#gold", "email"]},
+					id: "fosidfjoai",
+				},'notes'),
+				new Kinvey.Entity({
+					text: 'mmmmmmmm... #gold',
+					entities:{hashtags:["#gold"]},
+					id: "fosasdfoai"
+				},'notes'),
+				new Kinvey.Entity({
+					text: '#todo eat some #gold #bars to get your fiber',
+					entities:{hashtags:["#todo", "#gold", "#bars"]},
+					id: "fdsoai"
+				},'notes'),
+				new Kinvey.Entity({
+					text: 'sb#email foo hundred #bars',
+					entities:{hashtags:["#email", "#bars"]},
+					id: "fdsapeshiti"
+				},'notes'),
+				new Kinvey.Entity({
+					text: '#woot yeah',
+					entities:{hashtags:["#woot"]},
+					id: "lolsecksi"
+				},'notes')
+			];
+
+			var modelsArray = models.slice(0,3);
+			var model = models[4];
+
 			db.callAsync([
-				/*{
+				{
 					method: 'notes.update',
+					model:
+					options:{
+						dirty: true,
+						success: function(poo){
+							console.log(poo);
+						}
+					}
+				},
+				{
+					method: 'notes.create',
 					model: new Kinvey.Entity({
-						text: 'eighteen hundred #bars of #gold. #email your mother',
-						entities:{hashtags:["#bars", "#gold", "email"]},
-						id: "fosidfjoai",
-						localID: 1
+						text: '#todo eat some #gold #bars to get your fiber',
+						entities:{hashtags:["#todo", "#gold", "#bars"]},
+						id: "fdsoai",
 					},'notes'),
 					options:{
 						dirty: true,
@@ -31,52 +72,23 @@
 					}
 				},*/
 				{
-					method: 'notes.update',
-					model: new Kinvey.Entity({
-						text: '#todo: sit in my #gold plated chair foo #bars\nOh yeah day bow bow',
-						entities:{hashtags:["#todo", "#gold", "#bars"]},
-						id: "fdafjoai",
-						localID: 2
-					},'notes'),
-					options:{
-						dirty: true,
-						success: function(poo){
-							console.log(poo);
-						}
-					}
+					method: 'notes.get'
 				},
 				{
-					method: 'notes.get',
-					model: new Kinvey.Entity({
-						success: function (notes) {
-							alert(JSON.stringify(notes));
-						}
-					},'notes')
-				},
-				{
-					method: 'hashtags.get',
-					options:{
-						success: function(tags){
-							alert(JSON.stringify(tags));						
-						}
-					}
-					
+					method: 'hashtags.get'
+
 				},
 				//What the fuck figure out why no recur
 				{
 					method: 'hashtags.get',
 					options: {
-						hashtags:["#email"],
-						success: function(tags){
-							alert(JSON.stringify(tags));
-						}
+						hashtags:["#email"]
 					}
-					
 				}
-			], db)
-		
+			], db);
+
 		});
-		
+
 
 		</script>
 	</head>

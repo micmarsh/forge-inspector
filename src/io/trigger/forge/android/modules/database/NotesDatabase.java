@@ -151,6 +151,7 @@ public class NotesDatabase extends FetchDB{
 		String[] results = new String[strings.length()];
 		for(int i = 0; i < results.length; i++) results[i] = strings.getString(i);
 		return results;
+		
 	}
 
 	public synchronized int writeQuery(String query, JSONArray args) throws SQLException, JSONException{

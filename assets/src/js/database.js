@@ -77,19 +77,19 @@ Database = (function() {
     };
 
     Entities.prototype.get = function(args) {
-      var attags, hashtags, type;
-      alert("sheeeeeeit: " + (JSON.stringify(args)));
+      var attags, error, hashtags, success, type;
       args || (args = {});
-      attags = args.attags, hashtags = args.hashtags, type = args.type;
+      attags = args.attags, hashtags = args.hashtags, type = args.type, success = args.success, error = args.error;
       args = {
         attags: attags,
         hashtags: hashtags,
-        type: type
+        type: type,
+        success: success,
+        error: error
       };
       args.hashtags || (args.hashtags = []);
       args.attags || (args.attags = []);
       args.type = this._type;
-      alert("sheeeeeeit crazy-ass sanitation and shit: " + (JSON.stringify(args)));
       return forge.internal.call('database.query', {
         query: this._buildQuery(args),
         args: []
@@ -263,7 +263,7 @@ Database = (function() {
       var error, q, success, _i, _len;
       options || (options = {});
       success = options.success, error = options.error;
-      if (true) {
+      if (false) {
         console.log('##############################################\nwoot we debuggin\'');
         console.log(queries);
         for (_i = 0, _len = queries.length; _i < _len; _i++) {
