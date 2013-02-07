@@ -48,7 +48,13 @@
 
 					function changeNotes (models) {
 						models[0].set('text', "#woot yeah day bow bow, chick, chick, chick-a");
+						models[0].set('entities', {hashtags: ['#woot']});
 
+						models[2].set('text', '#todo be sure to get 8000g of #fiber nightly');
+						models[2].set('entities', {hashtags: ['#todo']});
+
+						models[3].set('text', '#todo finish your test cases, n00bsauce #woot yeah #babbage');
+						models[3].set('entities', {hashtags: ['#todo', '#woot', '#babbage']});
 					}
 
 					var allHashtags = _.sortBy([
@@ -196,7 +202,7 @@
 								hashtags: ['#woot', '#yeah'],
 								success: function(notes) {
 									if (!notes.length)
-										say('yay passed fourth test case');
+										say('yay passed sixth test case');
 									else
 										say(FAIL);
 
@@ -209,7 +215,7 @@
 							options: {
 								success: function (tags) {
 									if (_.isEqual(tags,allHashtags))
-										say('Yay you win the fifth test case');
+										say('Yay you win the seventh test case');
 									else
 										say(FAIL);
 								},
@@ -219,7 +225,7 @@
 						{
 							method: 'hashtags.get',
 							options: {
-								hashtags: ["#gold"]
+								hashtags: ["#gold"],
 								success: function (tags) {
 									if (_.isEqual(tags,_.sortBy([
 										{name: '#gold', count: 3},
@@ -228,10 +234,65 @@
 										{name: '#bars', count: 1}
 									],function (item) {
 										return item.name;
-									})))
-										say('Yay you win the sixth test case mofo!!!');
+									}))){
+										say('Yay you win the eigth test case mofo!!!');
+										changeNotes(models);//Get ready for the next round of tests!
+									}else
+										say(FAIL);
+								},
+								error: error
+							}
+						},
+						{
+							method: 'notes.update',
+							model: models.slice(0,2),
+							options: {
+								dirty: true,
+								success: function (ids) {
+									if (models[0].get('sync') === 'update' &&
+										models[1].get('sync') === 'update'){
+
+										alert(JSON.stringify(models));
+										say('yay you won the ninth one');
+									}else
+										say(FAIL);
+								},
+								error: error
+							}
+						},
+						{
+							method: 'notes.update',
+							model: models,
+							options: {
+								success: function (ids) {
+									var i = 0,
+										result = true;
+									for (i = 0; i < models.length; i++)
+										if (models[i].get('sync') !== 'synced')
+											result = false;
+
+									if(result)
+										say('yay you won the tenth one');
 									else
 										say(FAIL);
+								},
+								error: error
+							}
+						},
+						{
+							method: 'notes.get',
+							options: {
+								success: function(notes) {
+									var i = 0,
+										result = true;
+									for(i = 0; i < notes.length; i++)
+										if(!compare(notes[i], models[i]))
+											result = false;
+									if(result)
+										say('yay passed eleventh test case');
+									else
+										say(FAIL);
+
 								},
 								error: error
 							}

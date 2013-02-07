@@ -122,7 +122,6 @@ Database = (function() {
 
   Database.prototype.callAsync = function(calls, context) {
     var collection, currentCall, error, func, method, model, options, success, _ref;
-    alert(calls.length);
     if (calls.length) {
       currentCall = calls[0];
       method = currentCall.method, model = currentCall.model, options = currentCall.options;

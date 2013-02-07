@@ -141,7 +141,7 @@ public class NotesDatabase extends FetchDB{
 	public synchronized JSONArray queryToObjects(String query) throws JSONException{
 		open();
 		Cursor c = db.rawQuery(query, null);//the actual querying happens
-		JSONArray notes = cursorToArray(c);//extractNotesFromCursor(c);
+		JSONArray notes = cursorToArray(c);
 		c.close();
 		close();
 		return notes;
@@ -195,23 +195,7 @@ public class NotesDatabase extends FetchDB{
 		return results;
 	}
  	
-	//Takes a Cursor (the "raw" result of query in android) and converts it the a JSONArray of JSONObjects
-	private JSONArray extractNotesFromCursor(Cursor c) throws JSONException{
-		JSONArray toRet = new JSONArray();	
-
-		int[] cIndices = new int[NOTE_COLS.length];
-		for(int i = 0; i < NOTE_COLS.length;i++)cIndices[i] = c.getColumnIndex(NOTE_COLS[i]);//Find the indices of each column in the curso
-
-		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){//Extract note from cursor
-			toRet.put(new JSONObject()
-						.put("text",c.getString(cIndices[TEXT]))
-						.put("localID",c.getString(cIndices[LOCAL_ID]))
-						.put("lastModified",c.getString(cIndices[TIMESTAMP]))
-						.put("id", c.getString(cIndices[SERVER_ID]))
-						.put("sync", c.getString(cIndices[STATUS])));
-		}
-		return toRet;
-	}
+	
 
 	
 
