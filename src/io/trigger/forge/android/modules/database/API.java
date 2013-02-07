@@ -46,19 +46,7 @@ public class API {
 		}
 	}
 
-	
-	public static void write(final ForgeTask task, @ForgeParam("query") String query){
-		initDB();
-		try{
-			writeAll(task,new JSONArray().put(query));
-			//task.success(notesDB.writeQuery(query));
-		}catch(Exception e){
-			e.printStackTrace();
-			task.error(e);
-		}
 		
-	}
-	
 	public static void writeAll(final ForgeTask task, @ForgeParam("queries") JSONArray queries){
 		initDB();
 		try{

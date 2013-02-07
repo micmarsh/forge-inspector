@@ -160,7 +160,9 @@ public class NotesDatabase extends FetchDB{
 		//this needs to be actually grab id:
 		Cursor c = db.rawQuery("SELECT "+column+" from "+TABLE_NAMES[0], null);
 		c.moveToFirst();
-		return c.getInt(c.getColumnIndex(column));
+		int result = c.getInt(c.getColumnIndex(column));
+		c.close();
+		return result;
 	}
 	
 	private Object get(Cursor c, int index) {
