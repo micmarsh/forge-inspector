@@ -103,7 +103,7 @@ Database = (function() {
   /*
           General form of every function "db.<collection>.<function>(model, options)"
           (model, options) could just be (options)
-  
+
           db.callAsync [
               {
                   method: "collection.function"
@@ -347,7 +347,7 @@ Database = (function() {
       if (model.isNew()) {
         return " localID=\"" + (model.get('localID')) + "\"";
       } else {
-        return " id=\"" + model.id + "\"";
+        return " id=\"" + (model.get('id')) + "\"";
       }
     },
     _buildUpdateNoteQuery: function(model, cleaning) {
@@ -371,4 +371,3 @@ Database = (function() {
   return Database;
 
 })();
-
