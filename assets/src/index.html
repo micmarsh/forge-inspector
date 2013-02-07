@@ -57,6 +57,11 @@
 						models[3].set('entities', {hashtags: ['#todo', '#woot', '#babbage']});
 					}
 
+					//returns modified models array
+					function deleteNotes (models) {
+
+					}
+
 					var allHashtags = _.sortBy([
 						{name: '#gold', count:3},
 						{name: '#email', count:2},
@@ -73,6 +78,12 @@
 						{name: '#babbage', count: 1},
 						{name: '#todo', count:2},
 						{name:'#woot', count:3}
+						], function (item) {
+							return item.name;
+						});
+
+					var afterDeletedHashtags =  _.sortBy([
+						{name: '#woot', count: 2}
 						], function (item) {
 							return item.name;
 						});
@@ -310,11 +321,97 @@
 							options: {
 								success: function (tags) {
 									if (_.isEqual(tags, changedHashtags ))
-										say('Yay you win the seventh test case');
+										say('Yay you win the twelfth test case');
 									else
 										say(FAIL);
-									alert(JSON.toString(tags));
 									//delete some shit before next call!
+									// some dirty, some clean, to check appropriately
+								},
+								error: error
+							}
+						},
+						{
+							method: 'notes.delete',
+							model: models.slice(3),
+							options: {
+								dirty: true,
+								success: function (ids) {
+									if (models[3].get('sync') === 'delete' &&
+										models[4].get('sync') === 'delete'){
+										say('Woot woot lucky number 13!!!');
+									}else
+										say(FAIL);
+
+								},
+								error: error
+							}
+						},
+						{
+							method: 'notes.delete',
+							model: models.slice(1,4),
+							options: {
+								success: function (ids) {
+									//no test, just setting things up for
+									//next comparisons
+									models = models.slice(0,1).concat(models[4]);
+
+								},
+								error: error
+							}
+						},
+						{
+							method: 'notes.get',
+							options: {
+								success: function(notes) {
+									var i = 0,
+										result = true;
+									for (i = 0; i < notes.length; i++)
+										if(!compare(notes[i], models[i]))
+											result = false;
+									if (result)
+										say('yay passed 14th test case like a boss');
+									else
+										say(FAIL);
+									alert('Notes returned: '+JSON.stringify(notes));
+									alert('Actual models: '+JSON.stringify(models.map(function(model){
+										return model.toJSON(true);
+									})));
+								},
+								error: error
+							}
+						},
+						{
+							method: 'notes.get',
+							options: {
+								hashtags: ['#woot'],
+								success: function(notes) {
+									var i = 0,
+										result = true;
+									for (i = 0; i < notes.length; i++)
+										if(!compare(notes[i], models[i]))
+											result = false;
+									if (result)
+										say('yay passed 15th test case woot yeah');
+									else
+										say(FAIL);
+									alert('Notes returned: '+JSON.stringify(notes));
+									alert('Actual models: '+JSON.stringify(models.map(function(model){
+										return model.toJSON(true);
+									})));
+								},
+								error: error
+							}
+						},
+						{
+							method: 'hashtags.get',
+							options: {
+								success: function (tags) {
+									if( _.isEqual(afterDeletedHashtags, tags))
+										say("16th test case is real good");
+									else
+										say(FAIL);
+									alert(JSON.stringify(models));
+									alert(JSON.stringify(tags));
 								},
 								error: error
 							}

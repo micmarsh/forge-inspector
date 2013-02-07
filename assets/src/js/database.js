@@ -20,7 +20,7 @@ Database = (function() {
   Database.prototype._whereClause = function(args) {
     var attags, clauses, dirty, hashtags, search;
     hashtags = args.hashtags, attags = args.attags, search = args.search, dirty = args.dirty;
-    clauses = _.compact([(hashtags.length || attags.length ? " localID in (" + (Database.prototype._buildFilterQuery(hashtags, attags)) + ")" : ''), (search ? " text like '%" + search + "%' collate nocase " : ''), (dirty ? " sync_status != 'synced' " : '')]);
+    clauses = _.compact([(hashtags.length || attags.length ? " localID in (" + (Database.prototype._buildFilterQuery(hashtags, attags)) + ")" : ''), (search ? " text like '%" + search + "%' collate nocase " : ''), (dirty ? " sync != 'synced' " : '')]);
     if (clauses.length) {
       return "where " + clauses.join(' and ');
     } else {
@@ -225,33 +225,27 @@ Database = (function() {
       }, success, error);
     },
     _makeAndCallQuery: function(model, options, queryFunction, ifDirty) {
-      var cleaning, dirty, note, queries, wrapArray, _i, _len;
+      var addQuery, cleaning, dirty, note, queries, _i, _len;
       options || (options = {});
       cleaning = options.cleaning, dirty = options.dirty;
+      queries = [];
+      addQuery = function(note) {
+        note.set('sync', dirty ? ifDirty : 'synced');
+        return queries.push({
+          query: queryFunction(note, cleaning),
+          args: !dirty && ifDirty === 'delete' ? [] : [note.get('text')]
+        });
+      };
       if (_.isArray(model)) {
-        queries = [];
         console.log('about to make some queries');
         for (_i = 0, _len = model.length; _i < _len; _i++) {
           note = model[_i];
-          note.set('sync', dirty ? ifDirty : 'synced');
-          queries.push({
-            query: queryFunction(note, cleaning),
-            args: [note.get('text')]
-          });
+          addQuery(note);
         }
-        console.log('about to run some queries');
-        return this._writeAll(queries, options);
       } else {
-        model.set('sync', dirty ? ifDirty : 'synced');
-        wrapArray = [
-          {
-            query: queryFunction(model, cleaning),
-            args: [model.get('text')]
-          }
-        ];
-        console.log('about to call some queries');
-        return this._writeAll(wrapArray, options);
+        addQuery(model);
       }
+      return this._writeAll(queries, options);
     },
     _writeAll: function(queries, options) {
       var error, q, success, _i, _len;
