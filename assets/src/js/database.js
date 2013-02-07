@@ -227,13 +227,13 @@ Database = (function() {
     _makeAndCallQuery: function(model, options, queryFunction, ifDirty) {
       var cleaning, dirty, note, queries, wrapArray, _i, _len;
       options || (options = {});
-      cleaning = options.cleaning;
+      cleaning = options.cleaning, dirty = options.dirty;
       if (_.isArray(model)) {
         queries = [];
         console.log('about to make some queries');
         for (_i = 0, _len = model.length; _i < _len; _i++) {
           note = model[_i];
-          note.set('sync', 'synced');
+          note.set('sync', dirty ? ifDirty : 'synced');
           queries.push({
             query: queryFunction(note, cleaning),
             args: [note.get('text')]
@@ -242,12 +242,7 @@ Database = (function() {
         console.log('about to run some queries');
         return this._writeAll(queries, options);
       } else {
-        dirty = Boolean(options.dirty);
-        if (dirty) {
-          model.set('sync', ifDirty);
-        } else {
-          model.set('sync', 'synced');
-        }
+        model.set('sync', dirty ? ifDirty : 'synced');
         wrapArray = [
           {
             query: queryFunction(model, cleaning),
