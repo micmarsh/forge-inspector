@@ -85,8 +85,14 @@ public class NotesDatabase extends FetchDB{
 	}
 	
 	public void createTables(JSONArray tables) throws SQLException, JSONException{
+		open();
 		Log.e("create tables","non-fresh create tables called");
-		for(String name : toArray(tables)) db.execSQL(name+';');
+		for(int i = 0; i < tables.length(); i++){
+			JSONObject table = tables.getJSONObject(i);
+			db.execSQL("create table "+table.getString("name")+
+					' '+table.getString("schema"));
+		}
+		close();
 	}
 
 	private void create_tables(SQLiteDatabase db){
@@ -98,7 +104,9 @@ public class NotesDatabase extends FetchDB{
 
 
 	public  void dropTables(JSONArray tables) throws SQLException, JSONException{
+		open();
 		for(String name:toArray(tables))db.execSQL("drop table "+name+';');
+		close();
 	}
 
 	

@@ -35,7 +35,7 @@ public class API {
 		try{
 			NotesDatabase.setQueries(schema);
 			initDB();
-			notesDB.createTables(extractNames(schema));
+			notesDB.createTables(schema);
 			task.success();
 		}catch(Exception e){
 			e.printStackTrace();

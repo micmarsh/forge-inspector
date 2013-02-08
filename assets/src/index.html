@@ -11,10 +11,9 @@
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
 
-		forge.internal.call("database.createTables",{schema: window.tables},
-			function(){
+		var complete = function(){
 				//soon this is going to be dropTables or something
-				forge.internal.call('database.wipe',  {},
+				forge.internal.call("database.createTables",{schema: window.tables},
 					function(){
 						var db = new Database();
 
@@ -418,11 +417,20 @@
 									error: error
 								}
 							}
-							//Everything is in order?
 						], db);
 
 					});
 					}
+
+		forge.internal.call('database.dropTables', {
+				tables: window.tables.map(
+					function(object){
+						return object.name;
+					}
+				)
+			}
+			,complete
+			,complete
 			);
 
 
