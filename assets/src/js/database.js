@@ -20,7 +20,7 @@ Database = (function() {
   Database.prototype._whereClause = function(args) {
     var attags, clauses, dirty, hashtags, search;
     hashtags = args.hashtags, attags = args.attags, search = args.search, dirty = args.dirty;
-    clauses = _.compact([(hashtags.length || attags.length ? " localID in (" + (Database.prototype._buildFilterQuery(hashtags, attags)) + ")" : ''), (search ? " text like '%" + search + "%' collate nocase " : ''), (dirty ? " sync != 'synced' " : '')]);
+    clauses = _.compact([(hashtags.length || attags.length ? " localID in (" + (Database.prototype._buildFilterQuery(hashtags, attags)) + ")" : ''), (search ? " text like '%" + search + "%' collate nocase " : ''), (dirty === true ? " sync != 'synced' " : ''), (dirty === false ? " sync != 'delete' " : '')]);
     if (clauses.length) {
       return "where " + clauses.join(' and ');
     } else {
@@ -202,12 +202,22 @@ Database = (function() {
       }
     },
     clean: function(model) {
-      if (model.get('sync') === 'delete') {
-        return this["delete"](model);
+      var note, _i, _len, _results;
+      if (!_.isArray(model)) {
+        if (model.get('sync') === 'delete') {
+          return this["delete"](model);
+        } else {
+          return this.update(model, {
+            cleaning: true
+          });
+        }
       } else {
-        return this.update(model, {
-          cleaning: true
-        });
+        _results = [];
+        for (_i = 0, _len = model.length; _i < _len; _i++) {
+          note = model[_i];
+          _results.push(this.clean(note));
+        }
+        return _results;
       }
     },
     get: function(args) {
@@ -278,13 +288,16 @@ Database = (function() {
       }
     },
     _buildAddEntitiesQueries: function(models) {
-      var note, results, _i, _len;
-      results = [];
-      for (_i = 0, _len = models.length; _i < _len; _i++) {
-        note = models[_i];
-        results.push(this._buildNoteEntityQueries(Fetch.findEntities(note.get('text')), note.get('localID')));
-      }
-      return _.flatten(results);
+      var note;
+      return _.flatten((function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = models.length; _i < _len; _i++) {
+          note = models[_i];
+          _results.push(this._buildNoteEntityQueries(Fetch.findEntities(note.get('text')), note.get('localID')));
+        }
+        return _results;
+      }).call(this));
     },
     _buildNoteEntityQueries: function(entities, id) {
       var entName, entity, results, _i, _j, _len, _len1, _ref, _ref1;
@@ -351,6 +364,7 @@ Database = (function() {
       args.attags || (args.attags = []);
       args.skip || (args.skip = 0);
       args.limit || (args.limit = 25);
+      args.dirty || (args.dirty = false);
       skip = args.skip, limit = args.limit;
       return "select * from Notes " + this._whereClause(args) + " order by timestamp desc " + (" limit " + skip + "," + (skip + limit) + ";");
     }

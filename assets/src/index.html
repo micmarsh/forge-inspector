@@ -12,414 +12,417 @@
 		<script>
 
 		forge.internal.call("database.createTables",{schema: window.tables},
-		function(){
-			//soon this is going to be dropTables or something
-			forge.internal.call('database.wipe',  {},
-				function(){
-					var db = new Database();
+			function(){
+				//soon this is going to be dropTables or something
+				forge.internal.call('database.wipe',  {},
+					function(){
+						var db = new Database();
 
-					var models = [
-						new Kinvey.Entity({
-							text: '#email your mother bout caves. and #gold',
-							entities:{hashtags:["#gold", "#email"]},
-							id: "fosidfjoai",
-						},'notes'),
-						new Kinvey.Entity({
-							text: 'mmmmmmmm... #gold',
-							entities:{hashtags:["#gold"]},
-							id: "fosasdfoai"
-						},'notes'),
-						new Kinvey.Entity({
-							text: '#todo eat some #gold #bars to get your fiber',
-							entities:{hashtags:["#todo", "#gold", "#bars"]},
-							id: "fdsoai"
-						},'notes'),
-						new Kinvey.Entity({
-							text: 'sb#email foo hundred #bars',
-							entities:{hashtags:["#email", "#bars"]},
-							id: "fdsapeshiti"
-						},'notes'),
-						new Kinvey.Entity({
-							text: '#woot yeah',
-							entities:{hashtags:["#woot"]},
-							id: "lolsecksi"
-						},'notes')
-					];
+						var models = [
+							new Kinvey.Entity({
+								text: '#email your mother bout caves. and #gold',
+								entities:{hashtags:["#gold", "#email"]},
+								id: "fosidfjoai",
+							},'notes'),
+							new Kinvey.Entity({
+								text: 'mmmmmmmm... #gold',
+								entities:{hashtags:["#gold"]},
+								id: "fosasdfoai"
+							},'notes'),
+							new Kinvey.Entity({
+								text: '#todo eat some #gold #bars to get your fiber',
+								entities:{hashtags:["#todo", "#gold", "#bars"]},
+								id: "fdsoai"
+							},'notes'),
+							new Kinvey.Entity({
+								text: 'sb#email foo hundred #bars',
+								entities:{hashtags:["#email", "#bars"]},
+								id: "fdsapeshiti"
+							},'notes'),
+							new Kinvey.Entity({
+								text: '#woot yeah',
+								entities:{hashtags:["#woot"]},
+								id: "lolsecksi"
+							},'notes')
+						];
 
-					function changeNotes (models) {
-						models[0].set('text', "#woot yeah day bow bow, chick, chick, chick-a");
-						models[0].set('entities', {hashtags: ['#woot']});
+						function changeNotes (models) {
+							models[0].set('text', "#woot yeah day bow bow, chick, chick, chick-a");
+							models[0].set('entities', {hashtags: ['#woot']});
 
-						models[2].set('text', '#todo be sure to get 8000g of #fiber nightly');
-						models[2].set('entities', {hashtags: ['#todo']});
+							models[2].set('text', '#todo be sure to get 8000g of #fiber nightly');
+							models[2].set('entities', {hashtags: ['#todo']});
 
-						models[3].set('text', '#todo finish your test cases, n00bsauce #woot yeah #babbage');
-						models[3].set('entities', {hashtags: ['#todo', '#woot', '#babbage']});
-					}
-
-					//returns modified models array
-					function deleteNotes (models) {
-
-					}
-
-					var allHashtags = _.sortBy([
-						{name: '#gold', count:3},
-						{name: '#email', count:2},
-						{name: '#todo', count:1},
-						{name: '#bars', count: 2},
-						 {name:'#woot', count:1}
-						], function (item) {
-							return item.name;
-						});
-
-					var changedHashtags = _.sortBy([
-						{name: '#gold', count:1},
-						{name: '#fiber', count:1},
-						{name: '#babbage', count: 1},
-						{name: '#todo', count:2},
-						{name:'#woot', count:3}
-						], function (item) {
-							return item.name;
-						});
-
-					var afterDeletedHashtags =  _.sortBy([
-						{name: '#woot', count: 2}
-						], function (item) {
-							return item.name;
-						});
-
-					//TODO: Add an array and one of these, checking that returned id's line up (wipe db first!)
-					//create an equality operator for query result objects and kinvey objects, then test if a
-					//get all, get by a tag, get by 2 tags, and get by a tag combo that doesn't exist works
-
-					//get all tags check results, do the same for assoc tags
-
-					//edit some notes, delete some notes, do the same ^
-
-					const FAIL = 'You failed a test case F--';
-
-					function error(err) {
-						say('You really fucked up a test case');
-					};
-
-					function checkIDs (models, ids){
-						var i = 0;
-						for(i = 0; i < models.length; i++)
-							if(models[i].get('localID') !== ids[i])
-								return false
-						return true;
-					}
-
-					function compare(object, kinvey) {
-						var keys = Object.keys(object),
-							i = 0;
-
-						for(i = 0; i < keys.length; i++){
-							var key = keys[i];
-							if( (object[key] && kinvey.get(key)) && object[key] !== kinvey.get(key))
-								return false;
+							models[3].set('text', '#todo finish your test cases, n00bsauce #woot yeah #babbage');
+							models[3].set('entities', {hashtags: ['#todo', '#woot', '#babbage']});
 						}
 
-						return true;
+						//returns modified models array
+						function deleteNotes (models) {
 
-					};
-
-
-					function say(str) {
-						console.log(str);
-						alert(str);
-					}
-
-					db.callAsync([
-						{
-							method: 'notes.create',
-							model: models.slice(0,4),
-							options:{
-								success: function(ids){
-									if ( checkIDs(models.slice(0,4), [1,2,3,4]) )
-										say('Yay passed first test case');
-									else
-										say(FAIL);
-								},
-								error: error
-							}
-
-						},
-						{
-							method: 'notes.create',
-							model: models[4],
-							options: {
-								success: function(ids){
-									if ( checkIDs(models.slice(4), [5]) )
-										say('Yay passed second test case');
-									else
-										say(FAIL);
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.get',
-							options: {
-								success: function(notes) {
-									var i = 0,
-										result = true;
-									for(i = 0; i < notes.length; i++)
-										if(!compare(notes[i], models[i]))
-											result = false;
-									if(result)
-										say('yay passed third test case');
-									else
-										say(FAIL);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.get',
-							options: {
-								hashtags: ['#gold'],
-								success: function(notes) {
-									var i = 0,
-										result = true,
-										gModels = models.slice(0,3);
-									for (i = 0; i < notes.length; i++)
-										if(!compare(notes[i], gModels[i]))
-											result = false;
-									if (result)
-										say('yay passed fourth test case');
-									else
-										say(FAIL);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.get',
-							options: {
-								hashtags: ['#gold', '#bars'],
-								success: function(notes) {
-									var i = 0,
-										result = true,
-										gModels = models.slice(2,3);
-									for (i = 0; i < notes.length; i++)
-										if(!compare(notes[i], gModels[i]))
-											result = false;
-									if (result)
-										say('yay passed fifth test case like a boss');
-									else
-										say(FAIL);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.get',
-							options: {
-								hashtags: ['#woot', '#yeah'],
-								success: function(notes) {
-									if (!notes.length)
-										say('yay passed sixth test case');
-									else
-										say(FAIL);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'hashtags.get',
-							options: {
-								success: function (tags) {
-									if (_.isEqual(tags,allHashtags))
-										say('Yay you win the seventh test case');
-									else
-										say(FAIL);
-								},
-								error: error
-							}
-						},
-						{
-							method: 'hashtags.get',
-							options: {
-								hashtags: ["#gold"],
-								success: function (tags) {
-									if (_.isEqual(tags,_.sortBy([
-										{name: '#gold', count: 3},
-										{name: '#email', count: 1},
-										{name: '#todo', count: 1},
-										{name: '#bars', count: 1}
-									],function (item) {
-										return item.name;
-									}))){
-										say('Yay you win the eigth test case mofo!!!');
-										changeNotes(models);//Get ready for the next round of tests!
-									}else
-										say(FAIL);
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.update',
-							model: models.slice(0,2),
-							options: {
-								dirty: true,
-								success: function (ids) {
-									if (models[0].get('sync') === 'update' &&
-										models[1].get('sync') === 'update'){
-										say('yay you won the ninth one');
-									}else
-										say(FAIL);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.update',
-							model: models,
-							options: {
-								success: function (ids) {
-									var i = 0,
-										result = true;
-									for (i = 0; i < models.length; i++)
-										if (models[i].get('sync') !== 'synced')
-											result = false;
-
-									if(result)
-										say('yay you won the tenth one');
-									else
-										say(FAIL);
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.get',
-							options: {
-								success: function(notes) {
-									var i = 0,
-										result = true;
-									for(i = 0; i < notes.length; i++)
-										if(!compare(notes[i], models[i]))
-											result = false;
-									if(result)
-										say('yay passed eleventh test case');
-									else
-										say(FAIL);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'hashtags.get',
-							options: {
-								success: function (tags) {
-									if (_.isEqual(tags, changedHashtags ))
-										say('Yay you win the twelfth test case');
-									else
-										say(FAIL);
-									//delete some shit before next call!
-									// some dirty, some clean, to check appropriately
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.delete',
-							model: models.slice(3),
-							options: {
-								dirty: true,
-								success: function (ids) {
-									if (models[3].get('sync') === 'delete' &&
-										models[4].get('sync') === 'delete'){
-										say('Woot woot lucky number 13!!!');
-									}else
-										say(FAIL);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.delete',
-							model: models.slice(1,4),
-							options: {
-								success: function (ids) {
-									//no test, just setting things up for
-									//next comparisons
-									models = models.slice(0,1).concat(models[4]);
-
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.get',
-							options: {
-								success: function(notes) {
-									var i = 0,
-										result = true;
-									for (i = 0; i < notes.length; i++)
-										if(!compare(notes[i], models[i]))
-											result = false;
-									if (result)
-										say('yay passed 14th test case like a boss');
-									else
-										say(FAIL);
-									alert('Notes returned: '+JSON.stringify(notes));
-									alert('Actual models: '+JSON.stringify(models.map(function(model){
-										return model.toJSON(true);
-									})));
-								},
-								error: error
-							}
-						},
-						{
-							method: 'notes.get',
-							options: {
-								hashtags: ['#woot'],
-								success: function(notes) {
-									var i = 0,
-										result = true;
-									for (i = 0; i < notes.length; i++)
-										if(!compare(notes[i], models[i]))
-											result = false;
-									if (result)
-										say('yay passed 15th test case woot yeah');
-									else
-										say(FAIL);
-									alert('Notes returned: '+JSON.stringify(notes));
-									alert('Actual models: '+JSON.stringify(models.map(function(model){
-										return model.toJSON(true);
-									})));
-								},
-								error: error
-							}
-						},
-						{
-							method: 'hashtags.get',
-							options: {
-								success: function (tags) {
-									if( _.isEqual(afterDeletedHashtags, tags))
-										say("16th test case is real good");
-									else
-										say(FAIL);
-									alert(JSON.stringify(models));
-									alert(JSON.stringify(tags));
-								},
-								error: error
-							}
 						}
-					], db);
 
-				});
-				}
+						var allHashtags = _.sortBy([
+							{name: '#gold', count:3},
+							{name: '#email', count:2},
+							{name: '#todo', count:1},
+							{name: '#bars', count: 2},
+							 {name:'#woot', count:1}
+							], function (item) {
+								return item.name;
+							});
+
+						var changedHashtags = _.sortBy([
+							{name: '#gold', count:1},
+							{name: '#fiber', count:1},
+							{name: '#babbage', count: 1},
+							{name: '#todo', count:2},
+							{name:'#woot', count:3}
+							], function (item) {
+								return item.name;
+							});
+
+						var afterDeletedHashtags =  _.sortBy([
+							{name: '#woot', count: 1}
+							], function (item) {
+								return item.name;
+							});
+
+						//TODO: Add an array and one of these, checking that returned id's line up (wipe db first!)
+						//create an equality operator for query result objects and kinvey objects, then test if a
+						//get all, get by a tag, get by 2 tags, and get by a tag combo that doesn't exist works
+
+						//get all tags check results, do the same for assoc tags
+
+						//edit some notes, delete some notes, do the same ^
+
+						const FAIL = 'You failed a test case F--';
+
+						function error(err) {
+							say('You really fucked up a test case');
+						};
+
+						function checkIDs (models, ids){
+							var i = 0;
+							for(i = 0; i < models.length; i++)
+								if(models[i].get('localID') !== ids[i])
+									return false
+							return true;
+						}
+
+						function compare(object, kinvey) {
+							var keys = Object.keys(object),
+								i = 0;
+
+							for(i = 0; i < keys.length; i++){
+								var key = keys[i];
+								if( (object[key] && kinvey.get(key)) && object[key] !== kinvey.get(key))
+									return false;
+							}
+
+							return true;
+
+						};
+
+
+						function say(str) {
+							console.log(str);
+							alert(str);
+						}
+
+						db.callAsync([
+							{
+								method: 'notes.create',
+								model: models.slice(0,4),
+								options:{
+									success: function(ids){
+										if ( checkIDs(models.slice(0,4), [1,2,3,4]) )
+											say('Yay passed first test case');
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+
+							},
+							{
+								method: 'notes.create',
+								model: models[4],
+								options: {
+									success: function(ids){
+										if ( checkIDs(models.slice(4), [5]) )
+											say('Yay passed second test case');
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.get',
+								options: {
+									success: function(notes) {
+										var i = 0,
+											result = notes.length === models.length;
+										for(i = 0; i < notes.length; i++)
+											if(!compare(notes[i], models[i]))
+												result = false;
+										if(result)
+											say('yay passed third test case');
+										else
+											say(FAIL);
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.get',
+								options: {
+									hashtags: ['#gold'],
+									success: function(notes) {
+										var i = 0,
+											gModels = models.slice(0,3),
+											result = notes.length === gModels.length;
+
+										for (i = 0; i < notes.length; i++)
+											if(!compare(notes[i], gModels[i]))
+												result = false;
+										if (result)
+											say('yay passed fourth test case');
+										else
+											say(FAIL);
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.get',
+								options: {
+									hashtags: ['#gold', '#bars'],
+									success: function(notes) {
+										var i = 0,
+											gModels = models.slice(2,3),
+											result = notes.length === gModels.length;
+
+										for (i = 0; i < notes.length; i++)
+											if(!compare(notes[i], gModels[i]))
+												result = false;
+										if (result)
+											say('yay passed fifth test case like a boss');
+										else
+											say(FAIL);
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.get',
+								options: {
+									hashtags: ['#woot', '#yeah'],
+									success: function(notes) {
+										if (!notes.length)
+											say('yay passed sixth test case');
+										else
+											say(FAIL);
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'hashtags.get',
+								options: {
+									success: function (tags) {
+										if (_.isEqual(tags,allHashtags))
+											say('Yay you win the seventh test case');
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+							},
+							{
+								method: 'hashtags.get',
+								options: {
+									hashtags: ["#gold"],
+									success: function (tags) {
+										if (_.isEqual(tags,_.sortBy([
+											{name: '#gold', count: 3},
+											{name: '#email', count: 1},
+											{name: '#todo', count: 1},
+											{name: '#bars', count: 1}
+										],function (item) {
+											return item.name;
+										}))){
+											say('Yay you win the eighth test case mofo!!!');
+											changeNotes(models);//Get ready for the next round of tests!
+										}else
+											say(FAIL);
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.update',
+								model: models.slice(0,2),
+								options: {
+									dirty: true,
+									success: function (ids) {
+										if (models[0].get('sync') === 'update' &&
+											models[1].get('sync') === 'update'){
+											say('yay you won the ninth one');
+										}else
+											say(FAIL);
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.update',
+								model: models,
+								options: {
+									success: function (ids) {
+										var i = 0,
+											result = true;
+										for (i = 0; i < models.length; i++)
+											if (models[i].get('sync') !== 'synced')
+												result = false;
+
+										if(result)
+											say('yay you won the tenth one');
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.get',
+								options: {
+									success: function(notes) {
+										var i = 0,
+											result = notes.length === models.length;
+										for(i = 0; i < notes.length; i++)
+											if(!compare(notes[i], models[i]))
+												result = false;
+										if(result)
+											say('yay passed eleventh test case');
+										else
+											say(FAIL);
+
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'hashtags.get',
+								options: {
+									success: function (tags) {
+										if (_.isEqual(tags, changedHashtags ))
+											say('Yay you win the twelfth test case');
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.delete',
+								model: models.slice(3),
+								options: {
+									dirty: true,
+									success: function (ids) {
+										if (models[3].get('sync') === 'delete' &&
+											models[4].get('sync') === 'delete'){
+											say('Woot woot lucky number 13!!!');
+										}else
+											say(FAIL);
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.delete',
+								model: models.slice(1,4),
+								options: {
+									success: function (ids) {
+										//no test, just setting things up for
+										//next comparisons
+										models = models.slice(0,1).concat(models[4]);
+
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.get',
+								options: {
+									success: function(notes) {
+										var i = 0,
+											nonDeletedModels = models.slice(0,1),
+											result = notes.length === nonDeletedModels.length;
+										for (i = 0; i < notes.length; i++)
+											if(!compare(notes[i], nonDeletedModels[i]))
+												result = false;
+										if (result)
+											say('yay passed 14th test case like a boss');
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+							},
+							{
+								method: 'notes.clean',
+								model: model[0],
+								options: {
+									success: function () {
+										console.log("We need a success handler");
+									}
+								}
+							},
+							{
+								method: 'notes.get',
+								options: {
+									hashtags: ['#woot'],
+									success: function(notes) {
+										var i = 0,
+											nonDeletedModels = models.slice(0,1),
+											result = notes.length === nonDeletedModels.length;
+										for (i = 0; i < notes.length; i++)
+											if(!compare(notes[i], nonDeletedModels[i]))
+												result = false;
+										if (result)
+											say('yay passed 15th test case woot yeah');
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+							},
+							{
+								method: 'hashtags.get',
+								options: {
+									success: function (tags) {
+										if( _.isEqual(afterDeletedHashtags, tags))
+											say("16th test case is real good");
+										else
+											say(FAIL);
+									},
+									error: error
+								}
+							}
+							//Everything is in order?
+						], db);
+
+					});
+					}
 			);
 
 

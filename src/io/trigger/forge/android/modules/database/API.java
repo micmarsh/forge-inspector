@@ -24,11 +24,18 @@ public class API {
 		}
 	}
 
+	private static JSONArray/*<String>*/ extractNames(JSONArray/*<JSONObject>*/ array) throws JSONException{
+		JSONArray results = new JSONArray();
+		for(int i = 0; i < array.length(); i++)
+			results.put(array.getJSONObject(i).getString("name"));
+		return results;
+	}
+	
 	public static void createTables(final ForgeTask task, @ForgeParam("schema") JSONArray schema){
 		try{
 			NotesDatabase.setQueries(schema);
-			//Can't create new tables without onUpgrade yet, as it probably should be
 			initDB();
+			notesDB.createTables(extractNames(schema));
 			task.success();
 		}catch(Exception e){
 			e.printStackTrace();
@@ -64,10 +71,10 @@ public class API {
 		}
 	}
 		
-	public static void wipe(final ForgeTask task){
+	public static void dropTables(final ForgeTask task, @ForgeParam("tables") JSONArray tables){
 		initDB();
 		try{
-			notesDB.reset();
+			notesDB.dropTables(tables);
 			task.success();
 		}catch(Exception e){
 			task.error(e);
