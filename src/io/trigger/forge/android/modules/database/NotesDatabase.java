@@ -138,11 +138,9 @@ public class NotesDatabase extends FetchDB{
 		db.execSQL(query,toArray(args));
 		
 		String column= "last_insert_rowid()";
-		int CHOP = "insert into ".length();
-		int TABLE_NAME_INDEX = CHOP + " Notes ";
-		//this^ shit can probably be far more extensible
 		
-		Cursor c = db.rawQuery("SELECT "+column+" from "+query.substring(CHOP), null);
+		Cursor c = db.rawQuery("SELECT "+column+" from Notes", null);
+											//this^ is the worst shit ever
 		c.moveToFirst();
 		int result = c.getInt(c.getColumnIndex(column));
 		
