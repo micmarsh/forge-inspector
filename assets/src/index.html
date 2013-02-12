@@ -87,14 +87,6 @@
 								return item.name;
 							});
 
-						//TODO: Add an array and one of these, checking that returned id's line up (wipe db first!)
-						//create an equality operator for query result objects and kinvey objects, then test if a
-						//get all, get by a tag, get by 2 tags, and get by a tag combo that doesn't exist works
-
-						//get all tags check results, do the same for assoc tags
-
-						//edit some notes, delete some notes, do the same ^
-
 						const FAIL = 'You failed a test case F--';
 
 						function error(err) {
@@ -354,7 +346,9 @@
 										//no test, just setting things up for
 										//next comparisons
 										models = models.slice(0,1).concat(models[4]);
-
+										say("just cleaned, something's wrong: "+JSON.stringify(models.map(function (note) {
+											return note.toJSON(true);
+										})))
 									},
 									error: error
 								}
@@ -382,7 +376,7 @@
 								model: models[1],
 								options: {
 									success: function () {
-										console.log("We need a success handler");
+
 									}
 								}
 							},

@@ -116,28 +116,6 @@ public class NotesDatabase extends FetchDB{
 	}
 
 
- 	public synchronized JSONArray queryToTags(String query) throws JSONException{
-		return queryToEntities(query,"tag");
-	}
-
-	public synchronized JSONArray queryToEntities(String query, String type) throws JSONException{
-		open();
-		Cursor c = db.rawQuery(query, null);
-		JSONArray entities = new JSONArray();
-
-		int col = c.getColumnIndex(type);
-		int countCol = c.getColumnIndex("CountWoot");
-
-		for(c.moveToFirst();!c.isAfterLast();c.moveToNext()){
-			entities.put(new JSONObject().put("text", c.getString(col))
-					.put("count", c.getInt(countCol)));
-		}
-
-		c.close();
-		close();
-		return entities;
-	}
-
 	
 	//Takes a string, returns a JSONArray of JSONObjects
 	public synchronized JSONArray queryToObjects(String query) throws JSONException{
@@ -158,11 +136,16 @@ public class NotesDatabase extends FetchDB{
 
 	public synchronized int writeQuery(String query, JSONArray args) throws SQLException, JSONException{
 		db.execSQL(query,toArray(args));
+		
 		String column= "last_insert_rowid()";
-		//this needs to be actually grab id:
-		Cursor c = db.rawQuery("SELECT "+column+" from "+TABLE_NAMES[0], null);
+		int CHOP = "insert into ".length();
+		int TABLE_NAME_INDEX = CHOP + " Notes ";
+		//this^ shit can probably be far more extensible
+		
+		Cursor c = db.rawQuery("SELECT "+column+" from "+query.substring(CHOP), null);
 		c.moveToFirst();
 		int result = c.getInt(c.getColumnIndex(column));
+		
 		c.close();
 		return result;
 	}
@@ -198,11 +181,6 @@ public class NotesDatabase extends FetchDB{
 		
 		return results;
 	}
- 	
-	
-
-	
-
 
 }
 

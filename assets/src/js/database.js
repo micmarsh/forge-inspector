@@ -201,23 +201,20 @@ Database = (function() {
         return this._makeAndCallQuery(model, options, $.proxy(this._buildDeleteNoteQuery, this), 'delete');
       }
     },
-    clean: function(model) {
-      var note, _i, _len, _results;
+    clean: function(model, options) {
+      options.dirty = false;
       if (!_.isArray(model)) {
         if (model.get('sync') === 'delete') {
-          return this["delete"](model);
+          return this["delete"](model, options);
         } else {
-          return this.update(model, {
-            cleaning: true
-          });
+                    alert("sheeeeit" + JSON.stringify(model.toJSON(true)));
+
+          options.cleaning = true;
+          return this.update(model, options);
         }
       } else {
-        _results = [];
-        for (_i = 0, _len = model.length; _i < _len; _i++) {
-          note = model[_i];
-          _results.push(this.clean(note));
-        }
-        return _results;
+        if (options.error) options.error();
+        throw new Error("clean takes only a single object");
       }
     },
     get: function(args) {
