@@ -89,7 +89,7 @@ public class NotesDatabase extends FetchDB{
 		Log.e("create tables","non-fresh create tables called");
 		for(int i = 0; i < tables.length(); i++){
 			JSONObject table = tables.getJSONObject(i);
-			db.execSQL("create table "+table.getString("name")+
+			db.execSQL("create table if not exists "+table.getString("name")+
 					' '+table.getString("schema"));
 		}
 		close();
@@ -140,7 +140,8 @@ public class NotesDatabase extends FetchDB{
 		String column= "last_insert_rowid()";
 		
 		Cursor c = db.rawQuery("SELECT "+column+" from Notes", null);
-											//this^ is the worst shit ever
+										//this^ is the worst shit ever
+
 		c.moveToFirst();
 		int result = c.getInt(c.getColumnIndex(column));
 		
@@ -182,3 +183,4 @@ public class NotesDatabase extends FetchDB{
 
 }
 
+	
