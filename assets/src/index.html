@@ -262,8 +262,8 @@
 								options: {
 									dirty: true,
 									success: function (ids) {
-										if (models[0].get('sync') === 'update' &&
-											models[1].get('sync') === 'update'){
+										if (models[0].get('status') === 'update' &&
+											models[1].get('status') === 'update'){
 											say('yay you won the ninth one');
 										}else
 											say(FAIL);
@@ -280,7 +280,7 @@
 										var i = 0,
 											result = true;
 										for (i = 0; i < models.length; i++)
-											if (models[i].get('sync') !== 'synced')
+											if (models[i].get('status') !== 'synced')
 												result = false;
 
 										if(result)
@@ -328,8 +328,8 @@
 								options: {
 									dirty: true,
 									success: function (ids) {
-										if (models[3].get('sync') === 'delete' &&
-											models[4].get('sync') === 'delete'){
+										if (models[3].get('status') === 'delete' &&
+											models[4].get('status') === 'delete'){
 											say('Woot woot lucky number 13!!!');
 										}else
 											say(FAIL);
