@@ -205,10 +205,10 @@ Database = (function() {
       options.dirty = false;
       if (!_.isArray(model)) {
         if (model.get('sync') === 'delete') {
+          alert("baleeted!\n" + JSON.stringify(model.toJSON(true)));
           return this["delete"](model, options);
         } else {
-                    alert("sheeeeit" + JSON.stringify(model.toJSON(true)));
-
+          alert("sheeeeit\n" + JSON.stringify(model.toJSON(true)));
           options.cleaning = true;
           return this.update(model, options);
         }

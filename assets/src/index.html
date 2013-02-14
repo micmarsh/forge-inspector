@@ -346,9 +346,6 @@
 										//no test, just setting things up for
 										//next comparisons
 										models = models.slice(0,1).concat(models[4]);
-										say("just cleaned, something's wrong: "+JSON.stringify(models.map(function (note) {
-											return note.toJSON(true);
-										})))
 									},
 									error: error
 								}
@@ -362,56 +359,61 @@
 											result = notes.length === nonDeletedModels.length;
 										for (i = 0; i < notes.length; i++)
 											if(!compare(notes[i], nonDeletedModels[i]))
-												result = false;
+													result = false;
 										if (result)
 											say('yay passed 14th test case like a boss');
 										else
 											say(FAIL);
-									},
-									error: error
-								}
-							},
-							{
-								method: 'notes.clean',
-								model: models[1],
-								options: {
-									success: function () {
 
-									}
-								}
-							},
-							{
-								method: 'notes.get',
-								options: {
-									hashtags: ['#woot'],
-									success: function(notes) {
-										var i = 0,
-											nonDeletedModels = models.slice(0,1),
-											result = notes.length === nonDeletedModels.length;
-										for (i = 0; i < notes.length; i++)
-											if(!compare(notes[i], nonDeletedModels[i]))
-												result = false;
-										if (result)
-											say('yay passed 15th test case woot yeah');
-										else
-											say(FAIL);
-									},
-									error: error
-								}
-							},
-							{
-								method: 'hashtags.get',
-								options: {
-									success: function (tags) {
-										if( _.isEqual(afterDeletedHashtags, tags))
-											say("16th test case is real good");
-										else
-											say(FAIL);
+										db.callAsync([
+											{
+												method: 'notes.clean',
+												model: models[1],
+												options: {
+													success: function () {
+
+													}
+												}
+											},
+											{
+												method: 'notes.get',
+												options: {
+													hashtags: ['#woot'],
+													success: function(notes) {
+														var i = 0,
+															nonDeletedModels = models.slice(0,1),
+															result = notes.length === nonDeletedModels.length;
+														for (i = 0; i < notes.length; i++)
+															if(!compare(notes[i], nonDeletedModels[i]))
+																result = false;
+														if (result)
+															say('yay passed 15th test case woot yeah');
+														else
+															say(FAIL);
+													},
+													error: error
+												}
+											},
+											{
+												method: 'hashtags.get',
+												options: {
+													success: function (tags) {
+														if( _.isEqual(afterDeletedHashtags, tags))
+															say("16th test case is real good");
+														else
+															say(FAIL);
+													},
+													error: error
+												}
+											}
+										], db);
+
 									},
 									error: error
 								}
 							}
-						], db);
+						],db);
+
 
 					});
 					}
