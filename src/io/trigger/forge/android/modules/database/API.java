@@ -52,6 +52,22 @@ public class API {
 			task.error(e);
 		}
 	}
+	
+	public static void multiQuery(final ForgeTask task, @ForgeParam("queries") JSONArray queries){
+		initDB();
+		try{
+			notesDB.open();
+			JSONArray toRet = new JSONArray();
+			for(int i = 0; i < queries.length(); i++){
+				String query = queries.getString(i);
+				toRet.put(notesDB.queryToObjects(query, false));
+			}
+			notesDB.close();
+			task.success(toRet);
+		}catch(Exception e){
+			
+		}
+	}
 
 		
 	public static void writeAll(final ForgeTask task, @ForgeParam("queries") JSONArray queries){

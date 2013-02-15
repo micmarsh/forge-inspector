@@ -25,7 +25,7 @@
 							},'notes'),
 							new Kinvey.Entity({
 								text: 'mmmmmmmm... #gold',
-								entities:{hashtags:["#gold"]},
+								entities:{hashtags: ["#gold"]},
 								id: "fosasdfoai"
 							},'notes'),
 							new Kinvey.Entity({
@@ -402,6 +402,17 @@
 															say("16th test case is real good");
 														else
 															say(FAIL);
+													forge.internal.call('database.multiQuery',
+															{
+																queries: [
+																	"select * from Notes where id='poopshit'",
+																	"select * from Notes where id='fosidfjoai'"
+																]
+															}
+															,function (returned) {
+																alert(JSON.stringify(returned));
+															}
+															);
 													},
 													error: error
 												}

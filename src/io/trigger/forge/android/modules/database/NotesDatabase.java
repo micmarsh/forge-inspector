@@ -116,14 +116,17 @@ public class NotesDatabase extends FetchDB{
 	}
 
 
+ 	public synchronized JSONArray queryToObjects(String query) throws JSONException{
+ 		return queryToObjects(query, true);
+ 	}
 	
 	//Takes a string, returns a JSONArray of JSONObjects
-	public synchronized JSONArray queryToObjects(String query) throws JSONException{
-		open();
+	public synchronized JSONArray queryToObjects(String query, boolean atomic) throws JSONException{
+		if(atomic) open();
 		Cursor c = db.rawQuery(query, null);//the actual querying happens
 		JSONArray notes = cursorToArray(c);
 		c.close();
-		close();
+		if(atomic) close();
 		return notes;
 	}
 	
