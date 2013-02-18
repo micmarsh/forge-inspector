@@ -124,6 +124,7 @@ public class NotesDatabase extends FetchDB{
 	public synchronized JSONArray queryToObjects(String query, boolean atomic) throws JSONException{
 		if(atomic) open();
 		Cursor c = db.rawQuery(query, null);//the actual querying happens
+		Log.e("Cursor length: ",""+c.getCount());
 		JSONArray notes = cursorToArray(c);
 		c.close();
 		if(atomic) close();
@@ -171,6 +172,8 @@ public class NotesDatabase extends FetchDB{
 	private JSONArray cursorToArray(Cursor c) throws JSONException{
 		final String[] columnNames = c.getColumnNames();
 		JSONArray results = new JSONArray();
+		
+		Log.e("cursor", "All the columns: "+columnNames.length);
 		
 		for (c.moveToFirst();!c.isAfterLast();c.moveToNext()){
 			JSONObject object = new JSONObject();
