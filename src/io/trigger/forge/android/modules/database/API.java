@@ -49,6 +49,7 @@ public class API {
 		try{					
 			task.success(notesDB.queryToObjects(query));
 		}catch(Exception e){
+			e.printStackTrace();
 			task.error(e);
 		}
 	}
