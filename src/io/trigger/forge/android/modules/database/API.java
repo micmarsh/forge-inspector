@@ -1,8 +1,6 @@
 package io.trigger.forge.android.modules.database;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -23,15 +21,8 @@ public class API {
 			notesDB = new NotesDatabase(ForgeApp.getActivity());
 		}
 	}
-
-	private static JSONArray/*<String>*/ extractNames(JSONArray/*<JSONObject>*/ array) throws JSONException{
-		JSONArray results = new JSONArray();
-		for(int i = 0; i < array.length(); i++)
-			results.put(array.getJSONObject(i).getString("name"));
-		return results;
-	}
 	
-	public static void createTables(final ForgeTask task, @ForgeParam("schema") JSONArray schema){
+	public static void createTables(final ForgeTask task, @ForgeParam("schema") JsonArray schema){
 		try{
 			NotesDatabase.setQueries(schema);
 			initDB();
@@ -47,6 +38,7 @@ public class API {
 	public static void query(final ForgeTask task, @ForgeParam("query") String query){
 		initDB();
 		try{					
+			Log.e("query", ""+query);
 			task.success(notesDB.queryToObjects(query));
 		}catch(Exception e){
 			e.printStackTrace();

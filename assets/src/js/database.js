@@ -164,10 +164,7 @@ Database = (function() {
       args.hashtags || (args.hashtags = []);
       args.attags || (args.attags = []);
       args.type = this._type;
-      args.query = {
-        query: this._buildQuery(args),
-        args: []
-      };
+      args.query = this._buildQuery(args);
       return Database.prototype._getStuff(args);
     };
 

@@ -4,6 +4,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -60,14 +64,14 @@ public class NotesDatabase extends FetchDB{
 	private static String[] CREATE_TABLE_QUERIES = null;
 	private static String[] TABLE_NAMES = null;
 	
-	public static void setQueries(JSONArray schema) throws JSONException{
-		int length = schema.length();
+	public static void setQueries(JsonArray schema) throws JSONException{
+		int length = schema.size();//schema.length();
 		TABLE_NAMES = new String[length];
 		CREATE_TABLE_QUERIES = new String[length];
 		for(int i = 0; i < length; i++){
-			JSONObject info = schema.getJSONObject(i);
-			TABLE_NAMES[i] = info.getString("name");
-			CREATE_TABLE_QUERIES[i] = "CREATE TABLE "+info.getString("name")+" "+info.getString("schema");
+			JsonObject info = schema.get(i).getAsJsonObject();//.getJSONObject(i);
+			TABLE_NAMES[i] = info.get("name").getAsString();
+			CREATE_TABLE_QUERIES[i] = "CREATE TABLE "+info.get("name").getAsString()+" "+info.get("schema").getAsString();
 			Log.e("tables init'ed", CREATE_TABLE_QUERIES[i]);
 		}
 	}
