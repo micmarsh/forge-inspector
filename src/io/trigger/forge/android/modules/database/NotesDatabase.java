@@ -158,21 +158,20 @@ public class NotesDatabase extends FetchDB{
 		return result;
 	}
 	
-	private Object get(Cursor c, int index) {
+	private JsonPrimitive get(Cursor c, int index) {
 		switch(c.getType(index)){
-			case Cursor.FIELD_TYPE_BLOB:
-				return c.getBlob(index);
 			case Cursor.FIELD_TYPE_FLOAT:
-				return c.getFloat(index);
+				return new JsonPrimitive(c.getFloat(index));
 			case Cursor.FIELD_TYPE_INTEGER:
-				return c.getInt(index);
+				return new JsonPrimitive(c.getInt(index));
 			case Cursor.FIELD_TYPE_STRING:
-				return c.getString(index);
+				return new JsonPrimitive(c.getString(index));
 			case Cursor.FIELD_TYPE_NULL:
 			default:
 				return null;
 		}
 	}
+
 	
 	private JsonArray cursorToArray(Cursor c) throws JSONException{
 		final String[] columnNames = c.getColumnNames();
@@ -184,8 +183,7 @@ public class NotesDatabase extends FetchDB{
 			JsonObject object = new JsonObject();
 			for(String name : columnNames){
 				int index = c.getColumnIndex(name);
-				object.add(name, new JsonPrimitive(get(c, index)));
-				JsonObject e = new JsonObject();
+				object.add(name, get(c, index));
 			}
 			results.add(object);
 		}
