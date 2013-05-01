@@ -20,6 +20,8 @@ import java.net.URISyntaxException;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import com.google.gson.JsonArray;
+
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeParam;
 import io.trigger.forge.android.core.ForgeTask;
@@ -33,14 +35,14 @@ import android.view.KeyEvent;
 
 public class API {
 	
-	private static String[] toJavaArray(JSONArray array) throws JSONException{
-		String[] toRet = new String[array.length()];
+	private static String[] toJavaArray(JsonArray array) throws JSONException{
+		String[] toRet = new String[array.size()];
 		for(int i = 0; i < toRet.length; i++)
-			toRet[i] = array.getString(i);
+			toRet[i] = array.get(i).getAsString();
 		return toRet;
 	}
 			
-	public static void show(final ForgeTask task, @ForgeParam("items") final JSONArray JSONItems) throws JSONException{
+	public static void show(final ForgeTask task, @ForgeParam("items") final JsonArray JSONItems) throws JSONException{
 		final AlertDialog.Builder builder = new AlertDialog.Builder(
 				new ContextThemeWrapper(ForgeApp.getActivity(), android.R.style.Theme_Holo));
 		final String[] items = toJavaArray(JSONItems);
