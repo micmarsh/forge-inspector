@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -88,13 +89,13 @@ public class NotesDatabase extends FetchDB{
 		create_tables(db);
 	}
 	
-	public void createTables(JSONArray tables) throws SQLException, JSONException{
+	public void createTables(JsonArray schema) throws SQLException, JSONException{
 		open();
 		Log.e("create tables","non-fresh create tables called");
-		for(int i = 0; i < tables.length(); i++){
-			JSONObject table = tables.getJSONObject(i);
-			db.execSQL("create table if not exists "+table.getString("name")+
-					' '+table.getString("schema"));
+		for(int i = 0; i < schema.size(); i++){
+			JsonObject table = schema.get(i).getAsJsonObject();
+			db.execSQL("create table if not exists "+table.get("name").getAsString()+
+					' '+table.get("schema").getAsString());
 		}
 		close();
 	}
@@ -107,7 +108,7 @@ public class NotesDatabase extends FetchDB{
 
 
 
-	public  void dropTables(JSONArray tables) throws SQLException, JSONException{
+	public  void dropTables(JsonArray tables) throws SQLException, JSONException{
 		open();
 		for(String name:toArray(tables))db.execSQL("drop table "+name+';');
 		close();
@@ -120,29 +121,29 @@ public class NotesDatabase extends FetchDB{
 	}
 
 
- 	public synchronized JSONArray queryToObjects(String query) throws JSONException{
+ 	public synchronized JsonArray queryToObjects(String query) throws JSONException{
  		return queryToObjects(query, true);
  	}
 	
 	//Takes a string, returns a JSONArray of JSONObjects
-	public synchronized JSONArray queryToObjects(String query, boolean atomic) throws JSONException{
+	public synchronized JsonArray queryToObjects(String query, boolean atomic) throws JSONException{
 		if(atomic) open();
 		Cursor c = db.rawQuery(query, null);//the actual querying happens
 		Log.e("Cursor length: ",""+c.getCount());
-		JSONArray notes = cursorToArray(c);
+		JsonArray notes = cursorToArray(c);
 		c.close();
 		if(atomic) close();
 		return notes;
 	}
 	
-	private String[] toArray(JSONArray strings) throws JSONException{
-		String[] results = new String[strings.length()];
-		for(int i = 0; i < results.length; i++) results[i] = strings.getString(i);
+	private String[] toArray(JsonArray tables) throws JSONException{
+		String[] results = new String[tables.size()];
+		for(int i = 0; i < results.length; i++) results[i] = tables.get(i).getAsString();
 		return results;
 		
 	}
 
-	public synchronized int writeQuery(String query, JSONArray args) throws SQLException, JSONException{
+	public synchronized int writeQuery(String query, JsonArray args) throws SQLException, JSONException{
 		db.execSQL(query,toArray(args));
 		
 		String column= "last_insert_rowid()";
@@ -173,19 +174,20 @@ public class NotesDatabase extends FetchDB{
 		}
 	}
 	
-	private JSONArray cursorToArray(Cursor c) throws JSONException{
+	private JsonArray cursorToArray(Cursor c) throws JSONException{
 		final String[] columnNames = c.getColumnNames();
-		JSONArray results = new JSONArray();
+		JsonArray results = new JsonArray();
 		
 		Log.e("cursor", "All the columns: "+columnNames.length);
 		
 		for (c.moveToFirst();!c.isAfterLast();c.moveToNext()){
-			JSONObject object = new JSONObject();
+			JsonObject object = new JsonObject();
 			for(String name : columnNames){
 				int index = c.getColumnIndex(name);
-				object.put(name, get(c, index));
+				object.add(name, new JsonPrimitive(get(c, index)));
+				JsonObject e = new JsonObject();
 			}
-			results.put(object);
+			results.add(object);
 		}
 		
 		return results;

@@ -1,6 +1,9 @@
 package io.trigger.forge.android.modules.database;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -46,14 +49,14 @@ public class API {
 		}
 	}
 	
-	public static void multiQuery(final ForgeTask task, @ForgeParam("queries") JSONArray queries){
+	public static void multiQuery(final ForgeTask task, @ForgeParam("queries") JsonArray queries){
 		initDB();
 		try{
 			notesDB.open();
-			JSONArray toRet = new JSONArray();
-			for(int i = 0; i < queries.length(); i++){
-				String query = queries.getString(i);
-				toRet.put(notesDB.queryToObjects(query, false));
+			JsonArray toRet = new JsonArray();
+			for(int i = 0; i < queries.size(); i++){
+				String query = queries.get(i).getAsString();
+				toRet.add(notesDB.queryToObjects(query, false));
 			}
 			notesDB.close();
 			task.success(toRet);
@@ -63,14 +66,14 @@ public class API {
 	}
 
 		
-	public static void writeAll(final ForgeTask task, @ForgeParam("queries") JSONArray queries){
+	public static void writeAll(final ForgeTask task, @ForgeParam("queries") JsonArray queries){
 		initDB();
 		try{
 			notesDB.open();
-			JSONArray toRet = new JSONArray();
-			for(int i = 0; i < queries.length(); i++){
-				JSONObject query = queries.getJSONObject(i);
-				toRet.put(notesDB.writeQuery(query.getString("query"), query.getJSONArray("args")));
+			JsonArray toRet = new JsonArray();
+			for(int i = 0; i < queries.size(); i++){
+				JsonObject query = queries.get(i).getAsJsonObject();
+				toRet.add(new JsonPrimitive(notesDB.writeQuery(query.get("query").getAsString(), query.get("args").getAsJsonArray())));
 			}
 			notesDB.close();
 			task.success(toRet);
@@ -80,7 +83,7 @@ public class API {
 		}
 	}
 		
-	public static void dropTables(final ForgeTask task, @ForgeParam("tables") JSONArray tables){
+	public static void dropTables(final ForgeTask task, @ForgeParam("tables") JsonArray tables){
 		initDB();
 		try{
 			notesDB.dropTables(tables);
