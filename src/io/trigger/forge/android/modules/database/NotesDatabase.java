@@ -153,7 +153,7 @@ public class NotesDatabase extends FetchDB{
 		return result;
 	}
 	
-	private Object get(Cursor c, int index) {
+	private Object postHoneyComb(Cursor c, int index) {
 		switch(c.getType(index)){
 			case Cursor.FIELD_TYPE_BLOB:
 				return c.getBlob(index);
@@ -166,6 +166,27 @@ public class NotesDatabase extends FetchDB{
 			case Cursor.FIELD_TYPE_NULL:
 			default:
 				return null;
+		}
+	}
+	
+	//only ever going to be an int or a string, in our case
+	@SuppressWarnings("finally")
+	private Object preHoneyComb(Cursor c, int index) {
+		//lol the worst control flow
+		try{
+			return c.getString(index);
+		}catch(Exception e){
+			return c.getInt(index);
+		}finally{
+			return null;
+		}
+	}
+	
+	private Object get(Cursor c, int index) {
+		try {
+			return postHoneyComb(c, index);
+		}catch(java.lang.NoSuchMethodError e){
+			return preHoneyComb(c, index);
 		}
 	}
 	
