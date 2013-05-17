@@ -38,52 +38,26 @@ import android.widget.EditText;
 public class API {
 	public static KeyCharacterMap map = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
 	
+	private static Runnable typeString (final EditText webTextView, final String text) {
+		return new Runnable() {
+			@Override
+			public void run() {
+				webTextView.dispatchKeyEvent(new KeyEvent(SystemClock.uptimeMillis(), text, 
+						KeyCharacterMap.VIRTUAL_KEYBOARD, 0));
+			}
+		};
+	}
+	
+	private static void getTextViewAndTypeString(final ForgeActivity activity, final String text) {
+		final EditText webTextView = (EditText) activity.webView.getChildAt(0);
+		activity.runOnUiThread(typeString(webTextView, text));
+	}
+	
 	public static void typeText (final ForgeTask task, @ForgeParam("text") final String text){
 		try{
 			final ForgeActivity activity = ForgeApp.getActivity();
-			new Handler().postDelayed(new Runnable() {
-				@Override
-				public void run(){
-					final EditText webTextView = (EditText) activity.webView.getChildAt(0);
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-//							webTextView.setOnFocusChangeListener(new OnFocusChangeListener(){
-//								@Override
-//								public void onFocusChange(View v,
-//										boolean hasFocus) {
-//									Log.i("oh noes a focus change","hasFocus: "+hasFocus);
-//									if(!hasFocus){
-//										v.requestFocus();
-//									}
-//								}
-//							});
-							webTextView.dispatchKeyEvent(new KeyEvent(SystemClock.uptimeMillis(), text, 
-									KeyCharacterMap.VIRTUAL_KEYBOARD, 0));
-							new Handler().postDelayed(new Runnable(){
-								@Override
-								public void run() {
-									// TODO Auto-generated method stub
-									task.success();
-								}
-							},4000);
-							//task.error(new JSONObject());
-						}
-					});
-				}
-			}, 10);
+			getTextViewAndTypeString(activity,text);
 
-//			final ForgeActivity activity = ForgeApp.getActivity();
-//			final KeyEvent[] events = map.getEvents(text.toCharArray());
-//			Thread.sleep(5000);
-//			activity.runOnUiThread(new Runnable(){
-//				@Override
-//				public void run() {
-//					for(KeyEvent e : events)
-//						activity.dispatchKeyEvent(e);
-//					task.success();
-//				}
-//			});
 		}catch(Exception e){
 			e.printStackTrace();
 			task.error(e); 
