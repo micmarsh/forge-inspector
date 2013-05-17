@@ -168,26 +168,32 @@ public class NotesDatabase extends FetchDB{
 				return null;
 		}
 	}
-	
 	//only ever going to be an int or a string, in our case
-	@SuppressWarnings("finally")
 	private Object preHoneyComb(Cursor c, int index) {
 		//lol the worst control flow
+		System.out.println("prehoneycomblulz");
+		Object result = null;
 		try{
-			return c.getString(index);
+			System.out.println("trying getString");
+			result = c.getString(index);
 		}catch(Exception e){
-			return c.getInt(index);
-		}finally{
-			return null;
+			System.out.println("trying getInt");
+			result =  new Integer(c.getInt(index));
 		}
+		System.out.println("returning "+result);
+		return result;
+			
 	}
 	
-	private Object get(Cursor c, int index) {
+	private Object get(Cursor c, int index) { 	
+		Object result = null;
+		System.out.println("oh shit a get");
 		try {
-			return postHoneyComb(c, index);
+			result = postHoneyComb(c, index);
 		}catch(java.lang.NoSuchMethodError e){
-			return preHoneyComb(c, index);
+			result = preHoneyComb(c, index);
 		}
+		return result;	
 	}
 	
 	private JSONArray cursorToArray(Cursor c) throws JSONException{

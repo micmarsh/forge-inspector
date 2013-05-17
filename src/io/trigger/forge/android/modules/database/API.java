@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeParam;
@@ -32,6 +33,7 @@ public class API {
 	}
 	
 	public static void createTables(final ForgeTask task, @ForgeParam("schema") JSONArray schema){
+
 		try{
 			NotesDatabase.setQueries(schema);
 			initDB();
@@ -97,6 +99,5 @@ public class API {
 			task.error(e);
 		}
 	}
-
 
 }

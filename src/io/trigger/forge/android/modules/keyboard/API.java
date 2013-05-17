@@ -15,23 +15,81 @@ Copyright 2012 Fetchnotes,Inc.
    limitations under the License.
   */
 
+import org.json.JSONObject;
+
 import io.trigger.forge.android.core.ForgeActivity;
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeParam;
 import io.trigger.forge.android.core.ForgeTask;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
+import android.widget.EditText;
 
 public class API {
 	public static KeyCharacterMap map = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+	
+	public static void typeText (final ForgeTask task, @ForgeParam("text") final String text){
+		try{
+			final ForgeActivity activity = ForgeApp.getActivity();
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run(){
+					final EditText webTextView = (EditText) activity.webView.getChildAt(0);
+					activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+//							webTextView.setOnFocusChangeListener(new OnFocusChangeListener(){
+//								@Override
+//								public void onFocusChange(View v,
+//										boolean hasFocus) {
+//									Log.i("oh noes a focus change","hasFocus: "+hasFocus);
+//									if(!hasFocus){
+//										v.requestFocus();
+//									}
+//								}
+//							});
+							webTextView.dispatchKeyEvent(new KeyEvent(SystemClock.uptimeMillis(), text, 
+									KeyCharacterMap.VIRTUAL_KEYBOARD, 0));
+							new Handler().postDelayed(new Runnable(){
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									task.success();
+								}
+							},4000);
+							//task.error(new JSONObject());
+						}
+					});
+				}
+			}, 10);
+
+//			final ForgeActivity activity = ForgeApp.getActivity();
+//			final KeyEvent[] events = map.getEvents(text.toCharArray());
+//			Thread.sleep(5000);
+//			activity.runOnUiThread(new Runnable(){
+//				@Override
+//				public void run() {
+//					for(KeyEvent e : events)
+//						activity.dispatchKeyEvent(e);
+//					task.success();
+//				}
+//			});
+		}catch(Exception e){
+			e.printStackTrace();
+			task.error(e); 
+		}
+	}
+	
 	private static class StickyListener implements OnTouchListener{
 		private ForgeTask task;
 		public StickyListener setTask(ForgeTask task){

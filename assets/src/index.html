@@ -7,11 +7,16 @@
 		<script src="http://da189i1jfloii.cloudfront.net/js/kinvey-js-0.9.14.min.js"></script>
 		<script src="js/fetchnotes.js"></script>
 		<script src="js/database.js"></script>
+		
+		<script src="js/rangy-core.js"></script>
+		<script src="js/rangy-cssclassapplier.js"></script>
+		<script src="js/rangy-selectionsaverestore.js"></script>
+		<script src="js/rangy-serializer.js"></script>
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
 
-		var complete = function(){
+		/*var complete = function(){
 				//soon this is going to be dropTables or something
 				forge.internal.call("database.createTables",{schema: window.tables},
 					function(){
@@ -118,7 +123,7 @@
 
 						function say(str) {
 							console.log(str);
-							alert(str);
+							//alert(str);
 						}
 
 						db.callAsync([
@@ -439,7 +444,89 @@
 			,complete
 			,complete
 			);
+				function loopsiloo () {
+		alert("setting dat range");
+		document.getElementById('search-notes').setSelectionRange(3,3);
+		setTimeout(loopsiloo, 5000);
+	}();
+	setInterval(function(){
+		alert("setting dat range");
+		document.getElementById('search-notes').setSelectionRange(3,3);
+	}, 5000)
+	
+	*/
+	
+$(function () {
+forge.internal.call('inspector.list', {}, function (methods) {
+var modules = {};
+for (method in methods) {
+var parts = method.split('.');
+apimethod = parts.pop();
+var module = parts.join('.');
+if (!modules[module]) {
+modules[module] = {};
+}
+modules[module][apimethod] = methods[method];
+}
+for (module in modules) {
+$('#_module').append('<option>'+module+'</option>');
+}
+$('#_module').change(function () {
+var methods = modules[$(this).val()];
+$('#_method').html('');
+for (method in methods) {
+$('#_method').append('<option>'+method+'</option>');
+}
+$('#_method').change();
+})
+$('#_module').change();
+$('#_method').change(function () {
+var module = $('#_module').val();
+var method = $(this).val();
+var params = modules[module][method];
+$('.api_input').detach();
+for (param in params) {
+$('#_actions').before('<div class="control-group api_input"><label class="control-label" for="'+param+'">'+param+'</label><div class="controls"><input type="text" class="input-xlarge" id="'+param+'"></div></div>');
+}
+})
+$('#_method').change();
+$('#_run').click(function () {
+var module = $('#_module').val();
+var method = $('#_method').val();
+var params = {};
 
+$('.api_input input').each(function (i, x) {
+params[$(x).attr('id')] = $(x).val();
+});
+
+document.getElementById('search-notes').focus();
+
+
+$('#_output').prepend('<pre class="alert alert-info">Called "'+module+'.'+method+'" with "'+JSON.stringify(params, null, '')+'"</pre>');
+forge.internal.call(module+'.'+method, params, function () {
+$('#_output').prepend('<pre class="alert alert-success">Success for "'+module+'.'+method+'" with "'+JSON.stringify(arguments[0], null, '')+'"</pre>');
+
+}, function () {
+$('#_output').prepend('<pre class="alert alert-error">Error for "'+module+'.'+method+'" with "'+JSON.stringify(arguments[0], null, '')+'"</pre>');
+})
+});
+}, function () {
+alert("Error");
+});
+// forge.internal.addEventListener('*', function (event, e) {
+// if (event == 'inspector.eventTriggered') {
+// $('#_output').prepend('<pre class="alert alert-warning">Native event triggered "'+e.name+'"</pre>');
+// } else if (event == 'inspector.eventInvoked') {
+// if (e.class == 'ForgeEventListener') {
+// $('#_output').prepend('<pre class="alert alert-warning">Default event listener for "'+e.name+'" called</pre>');
+// } else {
+// $('#_output').prepend('<pre class="alert alert-warning">Calling event listener "'+e.name+'" in class "'+e.class+'"</pre>');
+// }
+// } else {
+// $('#_output').prepend('<pre class="alert alert-warning">Javascript event "'+event+'" triggered with data "'+JSON.stringify(e)+'"</pre>');
+// }
+// });
+});
 
 		</script>
 	</head>
@@ -449,6 +536,9 @@
 				<h1>Input  <small>choose an API call to make</small></h1>
 			</div>
 			<textarea id="search-notes" placeholder= "Search Notes" /></textarea>
+			<div class="form-actions" id="_actions">
+				<button type="submit" class="btn btn-primary" id="_run">Run!</button>
+			</div>
 			<div class="form-horizontal">
 					<div class="control-group">
 						<label class="control-label" for="_module">Module</label>
@@ -463,9 +553,6 @@
 							<select id="_method">
 							</select>
 						</div>
-					</div>
-					<div class="form-actions" id="_actions">
-						<button type="submit" class="btn btn-primary" id="_run">Run!</button>
 					</div>
 			</div>
 			<div class="page-header">
