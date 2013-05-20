@@ -13,6 +13,7 @@
 		"events":true,
 		"contprov":true,
 		"contact":true,
-		"database":true
+		"database":true,
+		"fixes":true
 	}
 }
