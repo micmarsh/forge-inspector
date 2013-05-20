@@ -57,7 +57,6 @@ public class API {
 		try{
 			final ForgeActivity activity = ForgeApp.getActivity();
 			getTextViewAndTypeString(activity,text);
-
 		}catch(Exception e){
 			e.printStackTrace();
 			task.error(e); 

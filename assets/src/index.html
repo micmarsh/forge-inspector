@@ -491,27 +491,24 @@ $('#_actions').before('<div class="control-group api_input"><label class="contro
 })
 $('#_method').change();
 $('#_run').click(function () {
-var module = $('#_module').val();
-var method = $('#_method').val();
-var params = {};
-
-$('.api_input input').each(function (i, x) {
-params[$(x).attr('id')] = $(x).val();
-});
-
-document.getElementById('search-notes').focus();
-
-
-$('#_output').prepend('<pre class="alert alert-info">Called "'+module+'.'+method+'" with "'+JSON.stringify(params, null, '')+'"</pre>');
-forge.internal.call(module+'.'+method, params, function () {
-$('#_output').prepend('<pre class="alert alert-success">Success for "'+module+'.'+method+'" with "'+JSON.stringify(arguments[0], null, '')+'"</pre>');
-
-}, function () {
-$('#_output').prepend('<pre class="alert alert-error">Error for "'+module+'.'+method+'" with "'+JSON.stringify(arguments[0], null, '')+'"</pre>');
-})
-});
-}, function () {
-alert("Error");
+	var module = $('#_module').val();
+	var method = $('#_method').val();
+	var params = {};
+	
+	$('.api_input input').each(function (i, x) {
+	params[$(x).attr('id')] = $(x).val();
+	});
+	document.getElementById('search-notes').focus();
+	$('#_output').prepend('<pre class="alert alert-info">Called "'+module+'.'+method+'" with "'+JSON.stringify(params, null, '')+'"</pre>');
+	
+	forge.internal.call(module+'.'+method, params, function () {
+	$('#_output').prepend('<pre class="alert alert-success">Success for "'+module+'.'+method+'" with "'+JSON.stringify(arguments[0], null, '')+'"</pre>');
+	}, function () {
+	$('#_output').prepend('<pre class="alert alert-error">Error for "'+module+'.'+method+'" with "'+JSON.stringify(arguments[0], null, '')+'"</pre>');
+	})
+	});
+	}, function () {
+	alert("Error");
 });
 // forge.internal.addEventListener('*', function (event, e) {
 // if (event == 'inspector.eventTriggered') {

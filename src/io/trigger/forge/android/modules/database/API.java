@@ -15,6 +15,23 @@ import io.trigger.forge.android.core.ForgeTask;
 
 public class API {
 	private static NotesDatabase notesDB;
+	
+	private static class DatabaseTask extends AsyncTask {
+		private Runnable toRun;
+		private DatabaseTask(Runnable r){
+			toRun = r;
+		}
+		@Override
+		protected Object doInBackground(Object... arg0) {
+			if(toRun != null)
+				toRun.run();
+			return null;
+		}
+		public static void runTask(Runnable r){
+			new DatabaseTask(r).execute();
+		}
+		
+	}
 
 	private static void initDB(){
 		Log.e("init notesdb: ","INITING NOTES DB");
@@ -32,19 +49,32 @@ public class API {
 		return results;
 	}
 	
-	public static void createTables(final ForgeTask task, @ForgeParam("schema") JSONArray schema){
+	public static void createTables(final ForgeTask task, @ForgeParam("schema") final JSONArray schema){
 
 		try{
-			NotesDatabase.setQueries(schema);
-			initDB();
-			notesDB.createTables(schema);
-			task.success();
+			DatabaseTask.runTask(new Runnable(){
+				@Override
+				public void run() {
+					try{
+					NotesDatabase.setQueries(schema);
+					initDB();
+					notesDB.createTables(schema);
+					task.success();
+					}catch( Exception e){
+						error(task, e);
+					}
+				}
+			});
 		}catch(Exception e){
-			e.printStackTrace();
-			task.error(e);
+			error(task, e);
 		}
 	}
-
+	
+	private static void error(ForgeTask task, Exception e){
+		e.printStackTrace();
+		task.error(e);
+	}
+	
 
 	public static void query(final ForgeTask task, @ForgeParam("query") String query){
 		initDB();
