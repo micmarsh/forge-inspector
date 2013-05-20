@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -148,7 +149,12 @@ public class NotesDatabase extends FetchDB{
 										//this^ is the worst shit ever
 
 		c.moveToFirst();
-		int result = c.getInt(c.getColumnIndex(column));
+		int result = 0;
+		try{
+			result = c.getInt(c.getColumnIndex(column));
+		}catch(CursorIndexOutOfBoundsException e){
+			//TODO: something, maybe
+		}
 		
 		c.close();
 		return result;
