@@ -51,23 +51,19 @@ public class API {
 	
 	public static void createTables(final ForgeTask task, @ForgeParam("schema") final JSONArray schema){
 
-		try{
-			DatabaseTask.runTask(new Runnable(){
-				@Override
-				public void run() {
-					try{
+		DatabaseTask.runTask(new Runnable(){
+			@Override
+			public void run() {
+				try{
 					NotesDatabase.setQueries(schema);
 					initDB();
 					notesDB.createTables(schema);
 					task.success();
-					}catch( Exception e){
-						error(task, e);
-					}
+				}catch( Exception e){
+					error(task, e);
 				}
-			});
-		}catch(Exception e){
-			error(task, e);
-		}
+			}
+		});
 	}
 	
 	private static void error(ForgeTask task, Exception e){
@@ -76,58 +72,76 @@ public class API {
 	}
 	
 
-	public static void query(final ForgeTask task, @ForgeParam("query") String query){
+	public static void query(final ForgeTask task, @ForgeParam("query") final String query){
 		initDB();
-		try{					
-			task.success(notesDB.queryToObjects(query));
-		}catch(Exception e){
-			e.printStackTrace();
-			task.error(e);
-		}
+		DatabaseTask.runTask(new Runnable(){
+			@Override
+			public void run() {
+				try{
+					task.success(notesDB.queryToObjects(query));
+				}catch( Exception e){
+					error(task, e);
+				}
+			}
+		});
 	}
 	
-	public static void multiQuery(final ForgeTask task, @ForgeParam("queries") JSONArray queries){
+	public static void multiQuery(final ForgeTask task, @ForgeParam("queries") final JSONArray queries){
 		initDB();
-		try{
-			notesDB.open();
-			JSONArray toRet = new JSONArray();
-			for(int i = 0; i < queries.length(); i++){
-				String query = queries.getString(i);
-				toRet.put(notesDB.queryToObjects(query, false));
+		DatabaseTask.runTask(new Runnable(){
+			@Override
+			public void run() {
+				try{
+					notesDB.open();
+					JSONArray toRet = new JSONArray();
+					for(int i = 0; i < queries.length(); i++){
+						String query = queries.getString(i);
+						toRet.put(notesDB.queryToObjects(query, false));
+					}
+					notesDB.close();
+					task.success(toRet);
+				}catch( Exception e){
+					error(task, e);
+				}
 			}
-			notesDB.close();
-			task.success(toRet);
-		}catch(Exception e){
-			
-		}
+		});
 	}
 
 		
-	public static void writeAll(final ForgeTask task, @ForgeParam("queries") JSONArray queries){
+	public static void writeAll(final ForgeTask task, @ForgeParam("queries") final JSONArray queries){
 		initDB();
-		try{
-			notesDB.open();
-			JSONArray toRet = new JSONArray();
-			for(int i = 0; i < queries.length(); i++){
-				JSONObject query = queries.getJSONObject(i);
-				toRet.put(notesDB.writeQuery(query.getString("query"), query.getJSONArray("args")));
+		DatabaseTask.runTask(new Runnable(){
+			@Override
+			public void run() {
+				try{
+					notesDB.open();
+					JSONArray toRet = new JSONArray();
+					for(int i = 0; i < queries.length(); i++){
+						JSONObject query = queries.getJSONObject(i);
+						toRet.put(notesDB.writeQuery(query.getString("query"), query.getJSONArray("args")));
+					}
+					notesDB.close();
+					task.success(toRet);
+				}catch( Exception e){
+					error(task, e);
+				}
 			}
-			notesDB.close();
-			task.success(toRet);
-		}catch(Exception e){
-			notesDB.close();
-			task.error(e);
-		}
+		});
 	}
 		
-	public static void dropTables(final ForgeTask task, @ForgeParam("tables") JSONArray tables){
+	public static void dropTables(final ForgeTask task, @ForgeParam("tables") final JSONArray tables){
 		initDB();
-		try{
-			notesDB.dropTables(tables);
-			task.success();
-		}catch(Exception e){
-			task.error(e);
-		}
+		DatabaseTask.runTask(new Runnable(){
+			@Override
+			public void run() {
+				try{
+					notesDB.dropTables(tables);
+					task.success();
+				}catch( Exception e){
+					error(task, e);
+				}
+			}
+		});
 	}
 
 }

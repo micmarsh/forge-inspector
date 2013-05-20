@@ -16,7 +16,7 @@
 		<link href="css/bootstrap-responsive.css" rel="stylesheet">
 		<script>
 
-		/*var complete = function(){
+		var complete = function(){
 				//soon this is going to be dropTables or something
 				forge.internal.call("database.createTables",{schema: window.tables},
 					function(){
@@ -444,17 +444,7 @@
 			,complete
 			,complete
 			);
-				function loopsiloo () {
-		alert("setting dat range");
-		document.getElementById('search-notes').setSelectionRange(3,3);
-		setTimeout(loopsiloo, 5000);
-	}();
-	setInterval(function(){
-		alert("setting dat range");
-		document.getElementById('search-notes').setSelectionRange(3,3);
-	}, 5000)
-	
-	*/
+
 	
 $(function () {
 forge.internal.call('inspector.list', {}, function (methods) {

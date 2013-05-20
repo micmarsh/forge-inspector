@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -153,6 +154,7 @@ public class NotesDatabase extends FetchDB{
 		return result;
 	}
 	
+	@SuppressLint("NewApi")
 	private Object postHoneyComb(Cursor c, int index) {
 		switch(c.getType(index)){
 			case Cursor.FIELD_TYPE_BLOB:
