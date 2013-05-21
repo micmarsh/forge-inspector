@@ -53,7 +53,8 @@ public class API {
 	
 	private static void getTextViewAndTypeString(final ForgeActivity activity, final String text) {
 		final EditText webTextView = (EditText) activity.webView.getChildAt(0);
-		activity.runOnUiThread(typeString(webTextView, text));
+		if(webTextView != null)
+			activity.runOnUiThread(typeString(webTextView, text));
 	}
 	
 	public static void typeText (final ForgeTask task, @ForgeParam("text") final String text){
