@@ -153,7 +153,7 @@ public class NotesDatabase extends FetchDB{
 		try{
 			result = c.getInt(c.getColumnIndex(column));
 		}catch(CursorIndexOutOfBoundsException e){
-			//TODO: something, maybe
+			//TODO: something, maybe	
 		}
 		
 		c.close();
