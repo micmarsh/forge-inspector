@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -158,6 +159,7 @@ public class NotesDatabase extends FetchDB{
 		return result;
 	}
 	
+	@SuppressLint("NewApi")
 	private JsonPrimitive get(Cursor c, int index) {
 		switch(c.getType(index)){
 			case Cursor.FIELD_TYPE_FLOAT:
