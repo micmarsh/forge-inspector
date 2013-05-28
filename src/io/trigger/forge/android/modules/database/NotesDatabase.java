@@ -1,17 +1,13 @@
 package io.trigger.forge.android.modules.database;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -66,7 +62,7 @@ public class NotesDatabase extends FetchDB{
 	private static String[] CREATE_TABLE_QUERIES = null;
 	private static String[] TABLE_NAMES = null;
 	
-	public static void setQueries(JsonArray schema) throws JSONException{
+	public static void setQueries(JsonArray schema) {
 		int length = schema.size();//schema.length();
 		TABLE_NAMES = new String[length];
 		CREATE_TABLE_QUERIES = new String[length];
@@ -90,7 +86,7 @@ public class NotesDatabase extends FetchDB{
 		create_tables(db);
 	}
 	
-	public void createTables(JsonArray schema) throws SQLException, JSONException{
+	public void createTables(JsonArray schema) throws SQLException{
 		open();
 		Log.e("create tables","non-fresh create tables called");
 		for(int i = 0; i < schema.size(); i++){
@@ -109,7 +105,7 @@ public class NotesDatabase extends FetchDB{
 
 
 
-	public  void dropTables(JsonArray tables) throws SQLException, JSONException{
+	public  void dropTables(JsonArray tables) throws SQLException {
 		open();
 		for(String name:toArray(tables))db.execSQL("drop table "+name+';');
 		close();
@@ -122,12 +118,12 @@ public class NotesDatabase extends FetchDB{
 	}
 
 
- 	public synchronized JsonArray queryToObjects(String query) throws JSONException{
+ 	public synchronized JsonArray queryToObjects(String query) {
  		return queryToObjects(query, true);
  	}
 	
 	//Takes a string, returns a JSONArray of JSONObjects
-	public synchronized JsonArray queryToObjects(String query, boolean atomic) throws JSONException{
+	public synchronized JsonArray queryToObjects(String query, boolean atomic) {
 		if(atomic) open();
 		Cursor c = db.rawQuery(query, null);//the actual querying happens
 		Log.e("Cursor length: ",""+c.getCount());
@@ -137,14 +133,14 @@ public class NotesDatabase extends FetchDB{
 		return notes;
 	}
 	
-	private String[] toArray(JsonArray tables) throws JSONException{
+	private String[] toArray(JsonArray tables) {
 		String[] results = new String[tables.size()];
 		for(int i = 0; i < results.length; i++) results[i] = tables.get(i).getAsString();
 		return results;
 		
 	}
 
-	public synchronized int writeQuery(String query, JsonArray args) throws SQLException, JSONException{
+	public synchronized int writeQuery(String query, JsonArray args) throws SQLException {
 		db.execSQL(query,toArray(args));
 		
 		String column= "last_insert_rowid()";
@@ -153,14 +149,19 @@ public class NotesDatabase extends FetchDB{
 										//this^ is the worst shit ever
 
 		c.moveToFirst();
-		int result = c.getInt(c.getColumnIndex(column));
+		int result = 0;
+		try{
+			result = c.getInt(c.getColumnIndex(column));
+		}catch(CursorIndexOutOfBoundsException e){
+			//TODO: something, maybe	
+		}
 		
 		c.close();
 		return result;
 	}
 	
 	@SuppressLint("NewApi")
-	private JsonPrimitive get(Cursor c, int index) {
+	private JsonPrimitive postHoneyComb(Cursor c, int index) {
 		switch(c.getType(index)){
 			case Cursor.FIELD_TYPE_FLOAT:
 				return new JsonPrimitive(c.getFloat(index));
@@ -173,9 +174,35 @@ public class NotesDatabase extends FetchDB{
 				return null;
 		}
 	}
-
+	//only ever going to be an int or a string, in our case
+	private JsonPrimitive preHoneyComb(Cursor c, int index) {
+		//lol the worst control flow
+		System.out.println("prehoneycomblulz");
+		JsonPrimitive result = null;
+		try{
+			System.out.println("trying getString");
+			result = new JsonPrimitive(c.getString(index));
+		}catch(Exception e){
+			System.out.println("trying getInt");
+			result =  new JsonPrimitive(c.getInt(index));
+		}
+		System.out.println("returning "+result);
+		return result;
+			
+	}
 	
-	private JsonArray cursorToArray(Cursor c) throws JSONException{
+	private JsonPrimitive get(Cursor c, int index) { 	
+		JsonPrimitive result = null;
+		System.out.println("oh shit a get");
+		try {
+			result = postHoneyComb(c, index);
+		}catch(java.lang.NoSuchMethodError e){
+			result = preHoneyComb(c, index);
+		}
+		return result;	
+	}
+	
+	private JsonArray cursorToArray(Cursor c) {
 		final String[] columnNames = c.getColumnNames();
 		JsonArray results = new JsonArray();
 		

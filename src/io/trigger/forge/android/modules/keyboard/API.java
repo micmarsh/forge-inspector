@@ -15,23 +15,58 @@ Copyright 2012 Fetchnotes,Inc.
    limitations under the License.
   */
 
+import org.json.JSONObject;
+
 import io.trigger.forge.android.core.ForgeActivity;
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeParam;
 import io.trigger.forge.android.core.ForgeTask;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
+import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
+import android.widget.EditText;
 
 public class API {
 	public static KeyCharacterMap map = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+	
+	private static Runnable typeString (final EditText webTextView, final String text) {
+		return new Runnable() {
+			@Override
+			public void run() {
+				webTextView.dispatchKeyEvent(new KeyEvent(SystemClock.uptimeMillis(), text, 
+						KeyCharacterMap.VIRTUAL_KEYBOARD, 0));
+			}
+		};
+	}
+	
+	private static void getTextViewAndTypeString(final ForgeActivity activity, final String text) {
+		final EditText webTextView = (EditText) activity.webView.getChildAt(0);
+		if(webTextView != null)
+			activity.runOnUiThread(typeString(webTextView, text));
+	}
+	
+	public static void typeText (final ForgeTask task, @ForgeParam("text") final String text){
+		try{
+			final ForgeActivity activity = ForgeApp.getActivity();
+			getTextViewAndTypeString(activity,text);
+		}catch(Exception e){
+			e.printStackTrace();
+			task.error(e); 
+		}
+	}
+	
 	private static class StickyListener implements OnTouchListener{
 		private ForgeTask task;
 		public StickyListener setTask(ForgeTask task){
